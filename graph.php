@@ -263,17 +263,17 @@ $mysqli->close();
     });
 
     function goMovie() {
-      aForm.action = "farm_main.php";
+      aForm.action = "main.php";
       aForm.submit();
     }
 
     function onGraph() {
-      aForm.action = "farm_graph.php";
+      aForm.action = "graph.php";
       aForm.submit();
     }
 
     function onDownload() {
-      aForm.action = "farm_csvdownload.php";
+      aForm.action = "csvdownload.php";
       aForm.submit();
     }
   </script>
@@ -302,7 +302,7 @@ $mysqli->close();
 </head>
 
 <body>
-  <form action="farm_main.php" method="post" name="aForm">
+  <form action="main.php" method="post" name="aForm">
     <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
     <input type="button" value="　撮影画像　" onClick="goMovie();"><input type="button" value="　グラフ　" onClick="onGraph();">
     <hr>
