@@ -101,7 +101,7 @@ for ($i = 0; $i < 1440; $i++) {
 /********************************************************************/
 //カメラマスタに接続して、カメラの情報を取得、プルダウンにして表示する
 // MySQLへ接続(DB_HOST,DB_USER,DB_PASS)
-$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 if ($mysqli->connect_error) {
   echo $mysqli->connect_error;
   exit();
@@ -109,7 +109,7 @@ if ($mysqli->connect_error) {
   $mysqli->set_charset("utf8");
 }
 //カメラ情報を取得するSELECT文格納
-$selStr = "SELECT * FROM M_CAMERA WHERE CAMERA_STATUS = 1";
+$selStr = "SELECT * FROM m_camera WHERE camera_starus = 1";
 
 // プルダウン選択前の$camera_idの初期値はカメラ1としておく
 if (empty($camera_id)) {
@@ -280,6 +280,13 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
     }
 
     /**
+     * 養殖日誌画面に遷移する処理
+     */
+    function onList() {
+      aForm.action = "list.php";
+      aForm.submit();
+    }
+    /**
      * 静止画データ結合処理を呼び出す関数
      *
      * @return void
@@ -445,7 +452,9 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
     <table>
       <td>
         <form action="farm_main_dev.php" method="post" name="aForm">
-          <input type="button" value="　撮影画像　" onClick="goImage();"><input type="button" value="　グラフ　" onClick="onGraph();">
+          <input type="button" value="　撮影画像　" onClick="goImage();">
+          <input type="button" value="　グラフ　" onClick="onGraph();">
+          <input type="button" value="養殖日誌" onClick="onList();">
           <input type="hidden" name="camera" value="<?php echo $camera_id ?>" />
         </form>
       </td>
