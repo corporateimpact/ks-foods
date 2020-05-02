@@ -71,9 +71,9 @@ if (isset($_GET['date_to'])) {
 
 // MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
 $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
-$sql = "SELECT substring(date_format(TIME,'%H:%i'),1,4) AS JIKAN,ROUND(AVG(SOIL_TEMP),2) AS SOIL_TEMP,ROUND(AVG(SOIL_WET),2) AS SOIL_WET,ROUND(AVG(SOIL_EC),2) AS SOIL_EC,ROUND(AVG(AIR_TEMP_1),2) AS AIR_TEMP1,ROUND(AVG(AIR_WET),2) AS AIR_WET FROM farm WHERE DAY = '";
+$sql = "select substring(date_format(TIME,'%H:%i'),1,4) AS JIKAN,round(AVG(SOIL_TEMP),2) as SOIL_TEMP,round(AVG(SOIL_WET),2) as SOIL_WET,round(AVG(SOIL_EC),2) as SOIL_EC,round(AVG(AIR_TEMP_1),2) s AIR_TEMP1,round(AVG(AIR_WET),2) as AIR_WET from farm where DAY = '";
 $sql = $sql . str_replace("/", "-", $org_date);
-$sql = $sql . "' GROUP BY substring(date_format(TIME,'%H:%i'),1,4) order by JIKAN";
+$sql = $sql . "' group by substring(date_format(TIME,'%H:%i'),1,4) order by JIKAN";
 $res = $mysqli->query($sql);
 $result1 = "";
 $result2 = "";
@@ -124,7 +124,7 @@ while ($row = $res->fetch_array()) {
 }
 
 //MySQLより最新の測定値情報を取得
-$sql = "SELECT * FROM farm ORDER BY day DESC,time DESC LIMIT 1";
+$sql = "select * from farm order by day desc,time desc limit 1";
 $res = $mysqli->query($sql);
 $row = $res->fetch_array();
 
