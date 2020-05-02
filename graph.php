@@ -71,7 +71,7 @@ if (isset($_GET['date_to'])) {
 
 // MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
 $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
-$sql = "select substring(date_format(TIME,'%H:%i'),1,4) AS JIKAN,round(AVG(SOIL_TEMP),2) as SOIL_TEMP,round(AVG(SOIL_WET),2) as SOIL_WET,round(AVG(SOIL_EC),2) as SOIL_EC,round(AVG(AIR_TEMP_1),2) s AIR_TEMP1,round(AVG(AIR_WET),2) as AIR_WET from farm where DAY = '";
+$sql = "select substring(date_format(TIME,'%H:%i'),1,4) AS JIKAN,round(AVG(SOIL_TEMP),2) as SOIL_TEMP,round(AVG(SOIL_WET),2) as SOIL_WET,round(AVG(SOIL_EC),2) as SOIL_EC,round(AVG(AIR_TEMP_1),2) as AIR_TEMP1,round(AVG(AIR_WET),2) as AIR_WET from farm where DAY = '";
 $sql = $sql . str_replace("/", "-", $org_date);
 $sql = $sql . "' group by substring(date_format(TIME,'%H:%i'),1,4) order by JIKAN";
 $res = $mysqli->query($sql);
