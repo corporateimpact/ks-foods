@@ -277,6 +277,13 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
       aForm.action = "graph.php";
       aForm.submit();
     }
+    /**
+     * 養殖日誌画面に遷移する処理
+     */
+    function onList() {
+      aForm.action = "list.php";
+      aForm.submit();
+    }
 
     /**
      * 静止画データ結合処理を呼び出す関数
@@ -436,7 +443,9 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
     <table>
       <td>
         <form action="farm_main.php" method="post" name="aForm">
-          <input type="button" value="　撮影画像　" onClick="goImage();"><input type="button" value="　グラフ　" onClick="onGraph();">
+          <input type="button" value="　撮影画像　" onClick="goImage();">
+          <input type="button" value="　グラフ　" onClick="onGraph();">
+          <input type="button" value="　養殖日誌　" onClick="onList();">
           <input type="hidden" name="camera" value="<?php echo $camera_id ?>" />
         </form>
       </td>

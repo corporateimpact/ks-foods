@@ -170,9 +170,9 @@ $data = array();
         <form action="list.php" method="post" name="aForm">
           <input type="hidden" name="line" value="">
           <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
-          <input type="button" value="撮影画像" onClick="goMovie();">
+          <input type="button" value="　撮影画像　" onClick="goMovie();">
           <input type="button" value="　グラフ　" onClick="onGraph();">
-          <input type="button" value="養殖日誌" onClick="onList();">
+          <input type="button" value="　養殖日誌　" onClick="onList();">
         </form>
       </td>
       <td>
