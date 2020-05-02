@@ -76,7 +76,7 @@ $data = array();
 <html>
 
 <head>
-  <title>給餌編集</title>
+  <title>養殖日誌編集</title>
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="css/jquery-ui.min.css" />
 
@@ -159,7 +159,9 @@ $data = array();
       <td>
         <form action="list.php" method="post" name="aForm">
           <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
-          <input type="button" value="　映像　" onClick="goMovie();"><input type="button" value="　グラフ　" onClick="onGraph();"><input type="button" value="銀鮭養殖日報" onClick="onList();">
+          <input type="button" value="撮影画像" onClick="goMovie();">
+          <input type="button" value="　グラフ　" onClick="onGraph();">
+          <input type="button" value="養殖日誌" onClick="onList();">
         </form>
       </td>
       <td>
