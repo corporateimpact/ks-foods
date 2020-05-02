@@ -69,6 +69,63 @@ if (isset($_GET['date_to'])) {
   }
 }
 
+$dArray;
+
+if (file_exists("/var/www/html/infos/" . $dateStr . ".dat")) {
+  $data = File("/var/www/html/infos/" . $dateStr . ".dat");
+  $label;
+  $temperature;
+  $humidity;
+  $water_temp;
+  foreach ($data as $row) {
+    $row = preg_replace("/\n/", "", $row);
+    $tmp = explode(",", $row);
+    $dArray{
+      str_replace(":", "", $tmp[0])} = $tmp;
+  }
+}
+$max =  array_fill(1, 10, -999);
+$min =  array_fill(1, 10, 999);
+$data = array();
+for ($i = 0; $i < 1440; $i++) {
+  $h = str_pad(floor($i / 60), 2, 0, STR_PAD_LEFT);
+  $m = str_pad(floor($i % 60), 2, 0, STR_PAD_LEFT);
+  if ($m % 10 == 0) {
+    if ($m == "00") {
+      $label .= "'" . $h . "時',";
+    } else {
+      $label .= "'',";
+    }
+    if (isset($dArray{
+      $h . $m . "00"})) {
+      for ($j = 1; $j < 10; $j++) {
+        if (isset($dArray{
+          $h . $m . "00"}[$j]) && $dArray{
+          $h . $m . "00"}[$j] != "") {
+          $data[$j] .= "'" . $dArray{
+            $h . $m . "00"}[$j] . "',";
+          if ($max[$j] < $dArray{
+            $h . $m . "00"}[$j]) {
+            $max[$j] = ceil($dArray{
+              $h . $m . "00"}[$j]);
+          }
+          if ($min[$j] > $dArray{
+            $h . $m . "00"}[$j]) {
+            $min[$j] = floor($dArray{
+              $h . $m . "00"}[$j]);
+          }
+        } else {
+          $data[$j] .= ",";
+        }
+      }
+    } else {
+      for ($j = 1; $j < 10; $j++) {
+        $data[$j] .= ",";
+      }
+    }
+  }
+}
+
 // MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
 $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
 $sql = "select substring(date_format(TIME,'%H:%i'),1,4) AS JIKAN,round(AVG(SOIL_TEMP),2) as SOIL_TEMP,round(AVG(SOIL_WET),2) as SOIL_WET,round(AVG(SOIL_EC),2) as SOIL_EC,round(AVG(AIR_TEMP_1),2) as AIR_TEMP1,round(AVG(AIR_WET),2) as AIR_WET from farm where DAY = '";
