@@ -69,73 +69,9 @@ if (isset($_GET['date_to'])) {
   }
 }
 
-$dArray;
-
-if (file_exists("/var/www/html/infos/" . $dateStr . ".dat")) {
-  $data = File("/var/www/html/infos/" . $dateStr . ".dat");
-  $label;
-  $temperature;
-  $humidity;
-  $water_temp;
-  foreach ($data as $row) {
-    $row = preg_replace("/\n/", "", $row);
-    $tmp = explode(",", $row);
-    $dArray{
-      str_replace(":", "", $tmp[0])} = $tmp;
-  }
-}
-$max =  array_fill(1, 10, -999);
-$min =  array_fill(1, 10, 999);
-$data = array();
-for ($i = 0; $i < 1440; $i++) {
-  $h = str_pad(floor($i / 60), 2, 0, STR_PAD_LEFT);
-  $m = str_pad(floor($i % 60), 2, 0, STR_PAD_LEFT);
-  if ($m % 10 == 0) {
-    if ($m == "00") {
-      $label .= "'" . $h . "時',";
-    } else {
-      $label .= "'',";
-    }
-    if (isset($dArray{
-      $h . $m . "00"})) {
-      for ($j = 1; $j < 10; $j++) {
-        if (isset($dArray{
-          $h . $m . "00"}[$j]) && $dArray{
-          $h . $m . "00"}[$j] != "") {
-          $data[$j] .= "'" . $dArray{
-            $h . $m . "00"}[$j] . "',";
-          if ($max[$j] < $dArray{
-            $h . $m . "00"}[$j]) {
-            $max[$j] = ceil($dArray{
-              $h . $m . "00"}[$j]);
-          }
-          if ($min[$j] > $dArray{
-            $h . $m . "00"}[$j]) {
-            $min[$j] = floor($dArray{
-              $h . $m . "00"}[$j]);
-          }
-        } else {
-          $data[$j] .= ",";
-        }
-      }
-    } else {
-      for ($j = 1; $j < 10; $j++) {
-        $data[$j] .= ",";
-      }
-    }
-  }
-}
-$mainImg = "img/Noimage_image.png";
-if (file_exists("/var/www/html/images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg")) {
-  $mainImg = "images/" . $dateStr . "/" . $dateStr . "_" . $timeStr . ".jpg";
-}
-
-
-
-
 // MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
 $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
-$sql = "select  substring(date_format(TIME,'%H:%i'),1,4) AS JIKAN,round(AVG(SOIL_TEMP),2) as SOIL_TEMP,round(AVG(SOIL_WET),2) as SOIL_WET,round(AVG(SOIL_EC),2) as SOIL_EC,round(AVG(AIR_TEMP_1),2) as AIR_TEMP1,round(AVG(AIR_WET),2) as AIR_WET FROM farm where DAY = '";
+$sql = "SELECT substring(date_format(TIME,'%H:%i'),1,4) AS JIKAN,ROUND(AVG(SOIL_TEMP),2) AS SOIL_TEMP,ROUND(AVG(SOIL_WET),2) AS SOIL_WET,ROUND(AVG(SOIL_EC),2) AS SOIL_EC,ROUND(AVG(AIR_TEMP_1),2) AS AIR_TEMP1,ROUND(AVG(AIR_WET),2) AS AIR_WET FROM farm WHERE DAY = '";
 $sql = $sql . str_replace("/", "-", $org_date);
 $sql = $sql . "' GROUP BY substring(date_format(TIME,'%H:%i'),1,4) order by JIKAN";
 $res = $mysqli->query($sql);
@@ -188,7 +124,7 @@ while ($row = $res->fetch_array()) {
 }
 
 //MySQLより最新の測定値情報を取得
-$sql = "select * from farm order by day desc,time desc limit 1";
+$sql = "SELECT * FROM farm ORDER BY day DESC,time DESC LIMIT 1";
 $res = $mysqli->query($sql);
 $row = $res->fetch_array();
 
@@ -262,18 +198,35 @@ $mysqli->close();
       $.datepicker.setDefaults($.datepicker.regional['ja']);
     });
 
+    /**
+     * メイン画面へ遷移する処理
+     */
     function goMovie() {
       aForm.action = "main.php";
       aForm.submit();
     }
 
+    /**
+     * グラフ画面に遷移する処理
+     */
     function onGraph() {
       aForm.action = "graph.php";
       aForm.submit();
     }
 
+    /**
+     * CSVダウンロード処理
+     */
     function onDownload() {
       aForm.action = "csvdownload.php";
+      aForm.submit();
+    }
+
+    /**
+     * 養殖日誌画面に遷移する処理
+     */
+    function onList() {
+      aForm.action = "list.php";
       aForm.submit();
     }
   </script>
@@ -304,7 +257,9 @@ $mysqli->close();
 <body>
   <form action="main.php" method="post" name="aForm">
     <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
-    <input type="button" value="　撮影画像　" onClick="goMovie();"><input type="button" value="　グラフ　" onClick="onGraph();">
+    <input type="button" value="　撮影画像　" onClick="goMovie();">
+    <input type="button" value="　グラフ　" onClick="onGraph();">
+    <input type="button" value="養殖日誌" onClick="onList();">
     <hr>
     <input type="button" value="グラフデータダウンロード" onclick="onDownload();"> <input type="text" name="date_from" id="xxdate2" readonly="readonly" value="<?php echo $org_date; ?>"> ～ <input type="text" name="date_to" id="xxdate3" readonly="readonly" value="<?php echo $org_date; ?>">
   </form>
