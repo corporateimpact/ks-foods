@@ -1,80 +1,78 @@
 <?php
 
-// ƒ^ƒCƒ€ƒAƒEƒgŽžŠÔ‚ð•ÏX‚·‚é
-ini_set("max_execution_time",600);
+// ã‚¿ã‚¤ãƒ ã‚¢ã‚¦ãƒˆæ™‚é–“ã‚’å¤‰æ›´ã™ã‚‹
+ini_set("max_execution_time", 600);
 
 $dateStr = date("Y/m/d");
 $dl_date_from = $dateStr;
-if(isset($_POST['date_from'])){
-	if($_POST['date_from'] != ""){
-		$dateStr = str_replace("/","",$_POST['date_from']);
-		$dl_date_from = $_POST['date_from'];
-		$timeStr = "000000";
-	}
+if (isset($_POST['date_from'])) {
+  if ($_POST['date_from'] != "") {
+    $dateStr = str_replace("/", "", $_POST['date_from']);
+    $dl_date_from = $_POST['date_from'];
+    $timeStr = "000000";
+  }
 }
-if(isset($_GET['date_from'])){
-	if($_GET['date_from'] != ""){
-		$dateStr = str_replace("/","",$_GET['date_from']);
-		$dl_date_from = $_GET['date_from'];
-		$timeStr = "000000";
-	}
+if (isset($_GET['date_from'])) {
+  if ($_GET['date_from'] != "") {
+    $dateStr = str_replace("/", "", $_GET['date_from']);
+    $dl_date_from = $_GET['date_from'];
+    $timeStr = "000000";
+  }
 }
 
 $dateStr = date("Y/m/d");
 $dl_date_to = $dateStr;
-if(isset($_POST['date_to'])){
-	if($_POST['date_to'] != ""){
-		$dateStr = str_replace("/","",$_POST['date_to']);
-		$dl_date_to = $_POST['date_to'];
-		$timeStr = "000000";
-	}
+if (isset($_POST['date_to'])) {
+  if ($_POST['date_to'] != "") {
+    $dateStr = str_replace("/", "", $_POST['date_to']);
+    $dl_date_to = $_POST['date_to'];
+    $timeStr = "000000";
+  }
 }
-if(isset($_GET['date_to'])){
-	if($_GET['date_to'] != ""){
-		$dateStr = str_replace("/","",$_GET['date_to']);
-		$dl_date_to = $_GET['date_to'];
-		$timeStr = "000000";
-	}
-}
-
-
-//‘—M‚³‚ê‚½from‚Æto‚Ì“ú•t‚ðƒ`ƒFƒbƒN
-if($dl_date_to < $dl_date_from) {
-	$dummy_date = $dl_date_from;
-	$dl_date_from = $dl_date_to;
-	$dl_date_to = $dummy_date;
+if (isset($_GET['date_to'])) {
+  if ($_GET['date_to'] != "") {
+    $dateStr = str_replace("/", "", $_GET['date_to']);
+    $dl_date_to = $_GET['date_to'];
+    $timeStr = "000000";
+  }
 }
 
 
-//‚b‚r‚uo—Í
+//é€ä¿¡ã•ã‚ŒãŸfromã¨toã®æ—¥ä»˜ã‚’ãƒã‚§ãƒƒã‚¯
+if ($dl_date_to < $dl_date_from) {
+  $dummy_date = $dl_date_from;
+  $dl_date_from = $dl_date_to;
+  $dl_date_to = $dummy_date;
+}
+
+
+//ï¼£ï¼³ï¼¶å‡ºåŠ›
 header("Content-Type: application/octet-stream");
-header("Content-Disposition: attachment; filename=". str_replace("/","",$dl_date_from) . "-". str_replace("/","",$dl_date_to) . ".csv");
+header("Content-Disposition: attachment; filename=" . str_replace("/", "", $dl_date_from) . "-" . str_replace("/", "", $dl_date_to) . ".csv");
 
 
-$mysqli = new mysqli ('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
 $mysqli->set_charset('utf8');
 
-//‘ª’è’lƒe[ƒuƒ‹’ŠoƒNƒGƒŠ
-$sql = "SELECT * FROM farm WHERE DAY BETWEEN '" . $dl_date_from. "' AND '". $dl_date_to. "' ORDER BY day,time";
+//æ¸¬å®šå€¤ãƒ†ãƒ¼ãƒ–ãƒ«æŠ½å‡ºã‚¯ã‚¨ãƒª
+$sql = "SELECT * FROM farm WHERE DAY BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY day,time";
 
 
 $res = $mysqli->query($sql);
 
-// ƒwƒbƒ_[ì¬
-echo "\"“ú•t\",\"Žž\",\"“yë‰·“x\",\"“yëŽ¼“x\",\"“d‹C“`“±“x\",\"‹C‰·\",\"Ž¼“x\"\r\n";
+// ãƒ˜ãƒƒãƒ€ãƒ¼ä½œæˆ
+echo "\"æ—¥ä»˜\",\"æ™‚åˆ»\",\"åœŸå£Œæ¸©åº¦\",\"åœŸå£Œæ¹¿åº¦\",\"é›»æ°—ä¼å°Žåº¦\",\"æ°—æ¸©\",\"æ¹¿åº¦\"\r\n";
 
 
-while($row = $res->fetch_array()) {
-  print("\"" . $row[0]. "\",\""	//“ú•t
-             . $row[1]. "\",\""	//Žž
-             . $row[2]. "\",\""	//“yë‰·“x
-             . $row[3]. "\",\""	//“yëŽ¼“x
-             . $row[4]. "\",\""	//“d‹C“`“±“x
-             . $row[5]. "\",\""	//‹C‰·
-             . $row[6]. "\"\r\n");//Ž¼“x
+while ($row = $res->fetch_array()) {
+  print("\"" . $row[0] . "\",\""  //æ—¥ä»˜
+    . $row[1] . "\",\""  //æ™‚åˆ»
+    . $row[2] . "\",\""  //åœŸå£Œæ¸©åº¦
+    . $row[3] . "\",\""  //åœŸå£Œæ¹¿åº¦
+    . $row[4] . "\",\""  //é›»æ°—ä¼å°Žåº¦
+    . $row[5] . "\",\""  //æ°—æ¸©
+    . $row[6] . "\"\r\n"); //æ¹¿åº¦
 }
 
 
 $mysqli->close();
-
-?>

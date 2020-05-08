@@ -4,7 +4,7 @@ import os
 import glob
 
 #dlフォルダのパスを設定する
-dl_path = "/var/www/html/farm/images/dl/"
+dl_path = "/var/www/html/ks-foods/images/dl/"
 
 def main():
     """
