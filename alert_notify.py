@@ -34,8 +34,8 @@ def LINE_notify(str_message):
 
     url = "https://notify-api.line.me/api/notify"
 #    token = #Here ACCESS-TOKEN input
-    # token = "ObFoG8pLNgIGpm04j7t0abp9wKMAJAuHHp08VFihIOb"  # <-TEST用のLINEト ークン
-    token = "KuVOB4yhowvMFycKBKFayLmUD2U0F5SMvdB1bPJ4kPY"  # <--ケーエスフーズアラート用のLINEトークン
+    token = "ObFoG8pLNgIGpm04j7t0abp9wKMAJAuHHp08VFihIOb"  # <-TEST用のLINEトークン
+    # token = "KuVOB4yhowvMFycKBKFayLmUD2U0F5SMvdB1bPJ4kPY"  # <--ケーエスフーズアラート用のLINEトークン
     headers = {"Authorization": "Bearer " + token}
     payload = {"message":  str_message}
 
