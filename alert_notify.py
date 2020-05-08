@@ -84,19 +84,19 @@ alert_flg = "OFF"  # LINEアラートが発生したら"ON"になる
 
 
 # 測定値テーブルに接続し直近の測定値を取得
-conn = mysql.connector.connect(
-    user="root", password="pm#corporate1", host="localhost", database="ksfoods")
-cur = conn.cursor()
-cur.execute("SELECT * FROM data ORDER BY day DESC, time DESC LIMIT 1;")
-for row in cur.fetchall():
-    fact_id = row[0]  # 工場ID
-    tank_no = row[1]  # 水槽ID
-    day_tbl = row[2]  # 日付
-    time_tbl = row[3]  # 時刻
-    water_temp = row[4]  # 水温
-    salinity = row[5]  # 塩分濃度
-    do = row[6]  # 溶存酸素
-cur.close()
+# conn = mysql.connector.connect(
+#     user="root", password="pm#corporate1", host="localhost", database="ksfoods")
+# cur = conn.cursor()
+# cur.execute("SELECT * FROM data ORDER BY day DESC, time DESC LIMIT 1;")
+# for row in cur.fetchall():
+#     fact_id = row[0]  # 工場ID
+#     tank_no = row[1]  # 水槽ID
+#     day_tbl = row[2]  # 日付
+#     time_tbl = row[3]  # 時刻
+#     water_temp = row[4]  # 水温
+#     salinity = row[5]  # 塩分濃度
+#     do = row[6]  # 溶存酸素
+# cur.close()
 
 # 測定値が直近のものか(10分前と比較)判断、測定が止まっていればアラート通知
 daytime = format(day_tbl) + " " + format(time_tbl) + ".999999"
