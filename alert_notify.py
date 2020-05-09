@@ -17,14 +17,6 @@ item_dict = {
     "do": "溶存酸素"
 }
 
-# メール送信のための情報を定数に格納する
-SMTP_HOST = 'xxxxxx'
-SMTP_PORT = 587
-MAIL_USER_NAME = 'xxxxxx'
-MAIL_PASSWORD = 'xxxxxx'
-MAIL_FROM_ADDRESS = 'xxxxxxxxxxxxxxx'
-# 送信先は複数になる。DBで受信者のマスタを作成して、送信先のON・OFFができるようにする
-MAIL_TO_ADDRESS = 'xxxxxxxxxxx'
 
 
 def LINE_notify(str_message):
