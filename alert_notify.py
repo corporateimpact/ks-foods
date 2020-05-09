@@ -18,13 +18,13 @@ item_dict = {
 }
 
 # メール送信のための情報を定数に格納する
-SMTP_HOST = 'smtp.corporate.co.jp'
+SMTP_HOST = 'xxxxxx'
 SMTP_PORT = 587
-MAIL_USER_NAME = 'itou.shou@corporate.co.jp'
-MAIL_PASSWORD = 'Y2g8tvNX'
-MAIL_FROM_ADDRESS = 'itou.shou@corporate.co.jp'
+MAIL_USER_NAME = 'xxxxxx'
+MAIL_PASSWORD = 'xxxxxx'
+MAIL_FROM_ADDRESS = 'xxxxxxxxxxxxxxx'
 # 送信先は複数になる。DBで受信者のマスタを作成して、送信先のON・OFFができるようにする
-MAIL_TO_ADDRESS = 'itou.shou@corporate.co.jp'
+MAIL_TO_ADDRESS = 'xxxxxxxxxxx'
 
 
 def LINE_notify(str_message):
@@ -64,7 +64,9 @@ def set_mail_message():
     送信するメールメッセージの設定を行う処理
     アラートごとの件名とメッセージを設定する
     """
-    pass
+    mail_cur = conn.cursor()
+    mail_cur.execute("SELCT * FROM M_MAIL WHERE SEND_FLAG = 'ON';")
+    for row in mail_cur.fetchall():
 
 
 def send_mail():
