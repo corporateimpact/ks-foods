@@ -101,7 +101,7 @@ for ($i = 0; $i < 1440; $i++) {
 /********************************************************************/
 //カメラマスタに接続して、カメラの情報を取得、プルダウンにして表示する
 // MySQLへ接続(DB_HOST,DB_USER,DB_PASS)
-$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods ');
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 if ($mysqli->connect_error) {
   echo $mysqli->connect_error;
   exit();
