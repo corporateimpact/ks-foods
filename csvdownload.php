@@ -55,7 +55,7 @@ $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 $mysqli->set_charset('utf8');
 
 //測定値テーブル抽出クエリ
-$sql = "SELECT day, time, water_temp, salinity, do FROM farm WHERE day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY day,time";
+$sql = "SELECT day, time, water_temp, salinity, do FROM data WHERE day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY day,time";
 
 
 $res = $mysqli->query($sql);
