@@ -10,7 +10,7 @@ if (isset($_POST['logout'])) {
   header('Location: http://160.16.239.88/index.php');
   exit;
 }
-$org_date = "";
+$org_date = date("Ymd");
 $dateStr = date("Ymd");
 $timeStr = date("Hi00");
 if (isset($_POST['date'])) {

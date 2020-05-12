@@ -51,27 +51,26 @@ header("Content-Type: application/octet-stream");
 header("Content-Disposition: attachment; filename=" . str_replace("/", "", $dl_date_from) . "-" . str_replace("/", "", $dl_date_to) . ".csv");
 
 
-$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 $mysqli->set_charset('utf8');
 
 //測定値テーブル抽出クエリ
-$sql = "SELECT * FROM farm WHERE DAY BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY day,time";
+$sql = "SELECT day, time, water_temp, salinity, do FROM farm WHERE day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY day,time";
 
 
 $res = $mysqli->query($sql);
 
 // ヘッダー作成
-echo "\"日付\",\"時刻\",\"土壌温度\",\"土壌湿度\",\"電気伝導度\",\"気温\",\"湿度\"\r\n";
+echo "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\"\r\n";
 
 
 while ($row = $res->fetch_array()) {
   print("\"" . $row[0] . "\",\""  //日付
     . $row[1] . "\",\""  //時刻
-    . $row[2] . "\",\""  //土壌温度
-    . $row[3] . "\",\""  //土壌湿度
-    . $row[4] . "\",\""  //電気伝導度
-    . $row[5] . "\",\""  //気温
-    . $row[6] . "\"\r\n"); //湿度
+    . $row[2] . "\",\""  //水温
+    . $row[3] . "\",\""  //塩分濃度
+    . $row[4] . "\",\""  //溶存酸素
+    . $row[5] . "\"\r\n"); //湿度
 }
 
 

@@ -316,7 +316,7 @@ $mysqli->close();
     <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
     <input type="button" value="　撮影画像　" onClick="goMovie();">
     <input type="button" value="　グラフ　" onClick="onGraph();">
-    <input type="button" value="　養殖日誌　" onClick="onList();">
+    <!-- <input type="button" value="　養殖日誌　" onClick="onList();"> -->
     <hr>
     <input type="button" value="グラフデータダウンロード" onclick="onDownload();"> <input type="text" name="date_from" id="xxdate2" readonly="readonly" value="<?php echo $org_date; ?>"> ～ <input type="text" name="date_to" id="xxdate3" readonly="readonly" value="<?php echo $org_date; ?>">
   </form>

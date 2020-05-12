@@ -101,7 +101,7 @@ for ($i = 0; $i < 1440; $i++) {
 /********************************************************************/
 //カメラマスタに接続して、カメラの情報を取得、プルダウンにして表示する
 // MySQLへ接続(DB_HOST,DB_USER,DB_PASS)
-$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods ');
 if ($mysqli->connect_error) {
   echo $mysqli->connect_error;
   exit();
@@ -445,7 +445,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
         <form action="farm_main.php" method="post" name="aForm">
           <input type="button" value="　撮影画像　" onClick="goImage();">
           <input type="button" value="　グラフ　" onClick="onGraph();">
-          <input type="button" value="　養殖日誌　" onClick="onList();">
+          <!-- <input type="button" value="　養殖日誌　" onClick="onList();"> -->
           <input type="hidden" name="camera" value="<?php echo $camera_id ?>" />
         </form>
       </td>
