@@ -130,12 +130,12 @@ if ($result = $mysqli->query($selStr)) {
     //row['カラム名']で、各カラムの値を取得する
     //テーブルのデータをOptionタグに成形
     //取得したカメラステータスを表示
-    // $status = $row['CAMERA_TYPE'];
-    // if ($status === '1') {
-    //   $camera_type = '(陸上)';
-    // } else {
-    //   $camera_type = '(水中)';
-    // }
+    $status = $row['CAMERA_TYPE'];
+    if ($status === '1') {
+      $camera_type = '(陸上)';
+    } else {
+      $camera_type = '(水中)';
+    }
 
     if ($row['CAMERA_ID'] == $camera_id) {
       //カメラのIDをプルダウンに格納
