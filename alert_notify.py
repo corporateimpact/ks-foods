@@ -48,7 +48,7 @@ def main():
     メイン関数
     """
     # メールサーバ接続処理
-    init_smtp()
+    # init_smtp()
 
     # データ取得処理を呼び出し
     get_data()
@@ -154,6 +154,8 @@ def set_mail_message():
         # mail_name = mail_row[1]
         mail_address = mail_row[2]
 
+        print(mail_address)
+
         # 送信対象のメールアドレスにメールを送信する
         send_mail(mail_address, mail_subject, mail_body)
 
@@ -168,7 +170,9 @@ def send_mail(to_address, str_subject, str_body):
                     (to_address, to_address, str_subject, str_body))
 
     # メール送信処理
-    smtp.sendmail(smtp_addr, to_address, mail_message)
+    # smtp.sendmail(smtp_addr, to_address, mail_message)
+
+    print(mail_message)
 
 
 def get_data():
@@ -281,13 +285,15 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
                 elif limit_tbl_flg == "2":  # フラグの値が"2"なら"OK"を立て、復旧のLINEメッセージを設定
                     alert_flg = "ON"  # アラート通知を"ON"にする（復旧のLINE通知）
                     limit_tbl_flg = "OK"
-                    line_message = set_line_message(line_message) + "が範囲内になりました。"
+                    line_message = set_line_message(
+                        line_message) + "が範囲内になりました。"
                 else:
                     pass
             elif current_value < limit_tbl_min:  # 最低値を下回った場合
                 if limit_tbl_flg == "OK":  # フラグの値が"OK"ならLINEアラート通知（低下）
                     alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
-                    line_message = set_line_message(line_message) + "が設定値より低下しました。"
+                    line_message = set_line_message(
+                        line_message) + "が設定値より低下しました。"
                 else:
                     pass
                 limit_tbl_flg = "NG"  # リミットテーブルのフラグに"NG"を立てる
@@ -295,7 +301,8 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             elif current_value > limit_tbl_max:  # 最大値を上回った場合
                 if limit_tbl_flg == "OK":  # フラグの値が"OK"ならLINEアラート通知（超過）
                     alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
-                    line_message = set_line_message(line_message) + "が設定値を超過しました。"
+                    line_message = set_line_message(
+                        line_message) + "が設定値を超過しました。"
                 else:
                     pass
                 limit_tbl_flg = "NG"  # リミットテーブルのフラグに"NG"を立てる
