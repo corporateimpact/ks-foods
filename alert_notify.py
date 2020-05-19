@@ -35,6 +35,7 @@ current_value = None  # 既定値テーブルの現在値
 smtp_addr = None  # 送信元アドレス
 smtp = None  # 送信元接続情報
 line_message = "<< ケーエスフーズIoTアラート >>"  # LINE通知のメッセージタイトル
+subject_head = line_message
 alert_flg = "OFF"  # LINEアラートが発生したら"ON"
 # --------------------------
 
@@ -140,7 +141,12 @@ def set_mail_message():
     mail_cur = common.connect_database_project()
 
     # メールの件名を作成する
-    mail_subject = limit_tbl_item
+    if limit_tbl_item != "":
+        mail_subject = subject_head + limit_tbl_item
+    else:
+        mail_subject = subject_head
+
+    # mail_subject = subject_head + limit_tbl_item
     # メールの本文を作成する
     mail_body = line_message
 
