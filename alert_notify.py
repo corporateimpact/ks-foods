@@ -200,8 +200,8 @@ def get_data():
         # デバッグ用。取得した値を出力する
         print("工場ID：" + str(fact_id))
         print("水槽ID：" + str(tank_no))
-        print("日付：" + day_tbl)
-        print("時間：" + time_tbl)
+        print("日付：" + str(day_tbl))
+        print("時間：" + str(time_tbl))
         print("水温" + str(water_temp))
         print("塩分濃度" + str(salinity))
         print("溶存酸素" + str(do))
