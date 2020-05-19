@@ -137,7 +137,7 @@ if ($result = $mysqli->query($selStr)) {
       $camera_type = '(水中)';
     }
 
-    if ($row['CAMERA_ID'] == $camera_id) {
+    if ($row['id'] == $camera_id) {
       //カメラのIDをプルダウンに格納
       $camera_data .= "<option value='" . $row['id'];
       $camera_data .= "' selected>カメラ:" . $row['id'] . $camera_type . "</option>";
@@ -488,7 +488,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
     </div>
   </div>
 
-  <form action="main_dev.php" method="POST" style="padding-top: 10px;" width="50%">
+  <form action="main.php" method="POST" style="padding-top: 10px;" width="50%">
     <table align="center">
       <thead>
         <th>開始日</th>
