@@ -87,6 +87,7 @@ def set_line_message(str_message):
     """
     LINEへ通知するメッセージを設定
     """
+    global limit_tbl_item
 
     if limit_tbl_item == "water_temp":
         str_message = str_message + "\n" + \
@@ -139,9 +140,9 @@ def set_mail_message():
     mail_cur = common.connect_database_project()
 
     # メールの件名を作成する
-    mail_subject = ""
+    mail_subject = limit_tbl_item
     # メールの本文を作成する
-    mail_body = ""
+    mail_body = line_message
 
     # メール配信フラグがONになっているデータを取得するSQL
     sel_mail_sql = "SELECT * FROM m_mail WHERE SEND_FLAG = 'ON';"
