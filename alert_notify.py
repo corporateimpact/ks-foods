@@ -198,13 +198,13 @@ def get_data():
         do = row[6]  # 溶存酸素
 
         # デバッグ用。取得した値を出力する
-        print("工場ID：" + fact_id)
-        print("水槽ID：" + tank_no)
+        print("工場ID：" + str(fact_id))
+        print("水槽ID：" + str(tank_no))
         print("日付：" + day_tbl)
         print("時間：" + time_tbl)
-        print("水温" + water_temp)
-        print("塩分濃度" + salinity)
-        print("溶存酸素" + do)
+        print("水温" + str(water_temp))
+        print("塩分濃度" + str(salinity))
+        print("溶存酸素" + str(do))
 
     # 後処理
     common.close_con_connect(common.pj_con, data_cur)
