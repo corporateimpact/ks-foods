@@ -140,11 +140,11 @@ if ($result = $mysqli->query($selStr)) {
     if ($row['CAMERA_ID'] == $camera_id) {
       //カメラのIDをプルダウンに格納
       $camera_data .= "<option value='" . $row['id'];
-      $camera_data .= "' selected>カメラ:" . $row['id'] . "</option>";
+      $camera_data .= "' selected>カメラ:" . $row['id'] . $camera_type . "</option>";
     } else {
       //カメラのIDをプルダウンに格納
       $camera_data .= "<option value='" . $row['id'];
-      $camera_data .= "'>カメラ:" . $row['id'] . "</option>";
+      $camera_data .= "'>カメラ:" . $row['id'] . $camera_type . "</option>";
     }
   }
 }
