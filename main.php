@@ -109,7 +109,7 @@ if ($mysqli->connect_error) {
   $mysqli->set_charset("utf8");
 }
 //カメラ情報を取得するSELECT文格納
-$selStr = "SELECT * FROM M_CAMERA WHERE CAMERA_STATUS = 1";
+$selStr = "SELECT * FROM m_camera WHERE camera_status = 1";
 
 // プルダウン選択前の$camera_idの初期値はカメラ1としておく
 if (empty($camera_id)) {
