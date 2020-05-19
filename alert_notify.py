@@ -141,7 +141,7 @@ def set_mail_message():
     mail_cur = common.connect_database_project()
 
     # メールの件名を作成する
-    if limit_tbl_item != "":
+    if limit_tbl_item is not None:
         mail_subject = subject_head + limit_tbl_item
     else:
         mail_subject = subject_head
