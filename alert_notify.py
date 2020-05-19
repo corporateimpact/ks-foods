@@ -183,7 +183,7 @@ def get_data():
     data_cur = common.connect_database_project()
 
     # 直近のデータを取得するSQL句の発行
-    sel_sql = "SELECT * FROM data ORDER BY DESC, time DESC LIMIT 1;"
+    sel_sql = "SELECT * FROM data ORDER BY day DESC, time DESC LIMIT 1;"
 
     # SQLを実行する
     data_cur.execute(sel_sql)
