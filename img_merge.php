@@ -29,7 +29,7 @@ if (isset($_REQUEST['camera'])) {
 }
 
 // 画像データが格納されているおおもとのパス
-$img_path = "/var/www/html/farm/images";
+$img_path = "/var/www/html/ks-foods/images";
 
 
 /*****************************************************
