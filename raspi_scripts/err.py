@@ -1,3 +1,7 @@
+"""
+共通エラー処理
+"""
+
 #!/usr/bin/ python
 # -*- coding: utf-8 -*-
 
@@ -10,8 +14,13 @@ e_limit = None
 
 #共通エラー処理 エラーカウンタが10を超えると再起動します
 def main():
+    """
+    メイン関数
+    """
+
     global sys_dir
     global e_limit
+
     config = configparser.ConfigParser()
     config.read('/home/pi/mainsys/system.ini')
     sys_dir = config.get('sys_info', 'main_dir')
@@ -21,8 +30,14 @@ def main():
 
 
 def error_counter():
+    """
+    エラーカウント処理
+    エラーカウントの規定値を設定し、超えた場合は再起動する
+    """
+
     global sys_dir
     global e_limit
+
     with open(sys_dir + 'e_cnt.dat', 'r') as f_err:
         err = f_err.read()
     e_counta = int(err) + 1
