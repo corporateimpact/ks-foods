@@ -109,7 +109,7 @@ if ($mysqli->connect_error) {
   $mysqli->set_charset("utf8");
 }
 //カメラ情報を取得するSELECT文格納
-$selStr = "SELECT * FROM m_camera WHERE camera_starus = 1";
+$selStr = "SELECT * FROM m_camera WHERE camera_status = 1";
 
 // プルダウン選択前の$camera_idの初期値はカメラ1としておく
 if (empty($camera_id)) {
@@ -130,21 +130,21 @@ if ($result = $mysqli->query($selStr)) {
     //row['カラム名']で、各カラムの値を取得する
     //テーブルのデータをOptionタグに成形
     //取得したカメラステータスを表示
-    // $status = $row['CAMERA_TYPE'];
-    // if ($status === '1') {
-    //   $camera_type = '(陸上)';
-    // } else {
-    //   $camera_type = '(水中)';
-    // }
+    $status = $row['camera_type'];
+    if ($status === '1') {
+      $camera_type = '(陸上)';
+    } else {
+      $camera_type = '(水中)';
+    }
 
-    if ($row['CAMERA_ID'] == $camera_id) {
+    if ($row['id'] == $camera_id) {
       //カメラのIDをプルダウンに格納
-      $camera_data .= "<option value='" . $row['CAMERA_ID'];
-      $camera_data .= "' selected>カメラ:" . $row['CAMERA_ID'] . "</option>";
+      $camera_data .= "<option value='" . $row['id'];
+      $camera_data .= "' selected>カメラ:" . $row['id'] . $camera_type . "</option>";
     } else {
       //カメラのIDをプルダウンに格納
-      $camera_data .= "<option value='" . $row['CAMERA_ID'];
-      $camera_data .= "'>カメラ:" . $row['CAMERA_ID'] . "</option>";
+      $camera_data .= "<option value='" . $row['id'];
+      $camera_data .= "' selected>カメラ:" . $row['id'] . $camera_type . "</option>";
     }
   }
 }
@@ -452,7 +452,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
   <div style="background-color:#FFF;height: 40px;">
     <table>
       <td>
-        <form action="farm_main_dev.php" method="post" name="aForm">
+        <form action="main_dev.php" method="post" name="aForm">
           <input type="button" value="　撮影画像　" onClick="goImage();">
           <input type="button" value="　グラフ　" onClick="onGraph();">
           <!-- <input type="button" value="　養殖日誌　" onClick="onList();"> -->
@@ -498,7 +498,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
     </div>
   </div>
 
-  <form action="farm_main_dev.php" method="POST" style="padding-top: 10px;" width="50%">
+  <form action="main_dev.php" method="POST" style="padding-top: 10px;" width="50%">
     <table align="center">
       <thead>
         <th>開始日</th>
