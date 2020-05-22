@@ -19,27 +19,21 @@ if (isset($_REQUEST['time'])) {
 }
 if (isset($_REQUEST['start_date'])) {
   $start_date = str_replace("/", "", $_REQUEST['start_date']);
-  //   echo $start_date;
 }
 if (isset($_REQUEST['end_date'])) {
   $end_date = str_replace("/", "", $_REQUEST['end_date']);
-  //   echo $end_date;
 }
 if (isset($_REQUEST['start_time'])) {
   $start_time = str_replace("/", "", $_REQUEST['start_time']);
-  //   echo $start_time;
 }
 if (isset($_REQUEST['end_time'])) {
   $end_time = str_replace("/", "", $_REQUEST['end_time']);
-  //   echo $end_time;
 }
 if (isset($_REQUEST['disp_speed'])) {
   $disp_speed = $_REQUEST['disp_speed'];
-  //   echo $disp_speed;
 }
 if (isset($_REQUEST['camera'])) {
   $camera_id = $_REQUEST['camera'];
-  //   echo $camera_id;
 }
 /*********************************/
 
