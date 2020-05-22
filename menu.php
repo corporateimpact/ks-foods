@@ -1,13 +1,13 @@
 <?php
 session_start();
 if (!isset($_SESSION['USER'])) {
-    header('Location: farm_index.php');
+    header('Location: index.php');
     exit;
 }
 
 if (isset($_POST['logout'])) {
     session_destroy();
-    header('Location: farm_index.php');
+    header('Location: index.php');
     exit;
 }
 ?>
@@ -33,12 +33,12 @@ if (isset($_POST['logout'])) {
         });
 
         function goMovie() {
-            aForm.action = "farm_main.php ";
+            aForm.action = "main.php ";
             aForm.submit();
         }
 
         function onGraph() {
-            aForm.action = "farm_graph.php";
+            aForm.action = "graph.php";
             aForm.submit();
         }
     </script>
