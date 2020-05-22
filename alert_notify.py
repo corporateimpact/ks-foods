@@ -34,7 +34,7 @@ limit_tbl_item = None  # 規定値テーブルの項目名
 current_value = None  # 既定値テーブルの現在値
 smtp_addr = None  # 送信元アドレス
 smtp = None  # 送信元接続情報
-line_message = "<< ケーエスフーズIoTアラート >>"  # LINE通知のメッセージタイトル
+line_message = "<< ケーエスフーズ：アラート通知 >>"  # LINE通知のメッセージタイトル
 subject_head = line_message
 alert_flg = "OFF"  # LINEアラートが発生したら"ON"
 # --------------------------
@@ -142,7 +142,7 @@ def set_mail_message():
 
     # メールの件名を作成する
     if limit_tbl_item is not None:
-        mail_subject = subject_head + limit_tbl_item
+        mail_subject = subject_head + "：" + limit_tbl_item + "エラー"
     else:
         mail_subject = subject_head
 
