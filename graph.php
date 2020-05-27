@@ -71,18 +71,6 @@ if (isset($_GET['date_to'])) {
 
 $dArray;
 
-if (file_exists("/var/www/html/infos/" . $dateStr . ".dat")) {
-  $data = File("/var/www/html/infos/" . $dateStr . ".dat");
-  $label;
-  $temperature;
-  $humidity;
-  foreach ($data as $row) {
-    $row = preg_replace("/\n/", "", $row);
-    $tmp = explode(",", $row);
-    $dArray{
-      str_replace(":", "", $tmp[0])} = $tmp;
-  }
-}
 $max =  array_fill(1, 10, -999);
 $min =  array_fill(1, 10, 999);
 $data = array();
@@ -131,9 +119,9 @@ $sql = "select substring(date_format(time,'%H:%i'),1,4) AS JIKAN,round(AVG(water
 $sql = $sql . str_replace("/", "-", $org_date);
 $sql = $sql . "' group by substring(date_format(time,'%H:%i'),1,4) order by JIKAN";
 $res = $mysqli->query($sql);
-$result1 = "";  //water_temp
-$result2 = "";  //salinity
-$result3 = "";  //do
+$water_temp = "";   //水温
+$salinity = "";     //塩分濃度
+$do = "";           //溶存酸素濃度
 
 $i_next = 0;
 $j_next = 0;
@@ -141,9 +129,9 @@ while ($row = $res->fetch_array()) {
   for ($i = $i_next; $i < 25; $i++) {
     for ($j = $j_next; $j < 6; $j++) {
       if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
-        $result1 = $result1 . $row[1] . ",";
-        $result2 = $result2 . $row[2] . ",";
-        $result3 = $result3 . $row[3] . ",";
+        $water_temp = $water_temp . $row[1] . ",";
+        $salinity = $salinity . $row[2] . ",";
+        $do = $do . $row[3] . ",";
         if ($j == 3) {
           $j_next = 0;
           $i_next = $i + 1;
@@ -153,16 +141,16 @@ while ($row = $res->fetch_array()) {
         }
         break 2;
       } elseif (substr($row[0], 0, 2) > $i) {
-        $result1 = $result1 . ",";
-        $result2 = $result2 . ",";
-        $result3 = $result3 . ",";
+        $water_temp = $water_temp . ",";
+        $salinity = $salinity . ",";
+        $do = $do . ",";
         if ($j == 3) {
           $j_next = 0;
         }
       } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
-        $result1 = $result1 . ",";
-        $result2 = $result2 . ",";
-        $result3 = $result3 . ",";
+        $water_temp = $water_temp . ",";
+        $salinity = $salinity . ",";
+        $do = $do . ",";
         if ($j == 3) {
           $j_next = 0;
         }
@@ -176,13 +164,15 @@ $sql = "select * from ksfoods.data order by day desc,time desc limit 1";
 $res = $mysqli->query($sql);
 $row = $res->fetch_array();
 
+
+// ここで取得した値はグラフ上側の現在値の表示に利用します
 $fact_id = $row[0];
 $tank_no = $row[1];
-$day = $row[2];
-$time = $row[3];
-$water_temp = $row[4];
-$salinity = $row[5];
-$do = $row[6];
+$day_now = $row[2];
+$time_now = $row[3];
+$water_temp_now = $row[4];
+$salinity_now = $row[5];
+$do_now = $row[6];
 
 $mysqli->close();
 
@@ -323,11 +313,11 @@ $mysqli->close();
   <strong>
     <font color="white" size="5">
       <div align="center">
-        <span class="abc" style="background-color:#000000"><?php echo $day . " " . substr($time, 0, 5) . " 時点"; ?></span>
-        <span class="abc" style="background-color:#000000">気温：<?php echo $water_temp . "℃"; ?></span>
-        <span class="abc" style="background-color:#000000">水温：<?php echo $water_temp . "℃"; ?></span>
-        <span class="abc" style="background-color:#000000">塩分濃度：<?php echo $salinity . "％"; ?></span>
-        <span class="abc" style="background-color:#000000">溶存酸素濃度：<?php echo $do . ""; ?></span>
+        <span class="abc" style="background-color:#000000"><?php echo $day_now . " " . substr($time, 0, 5) . " 時点"; ?></span>
+        <span class="abc" style="background-color:#000000">気温：<?php echo $water_temp_now . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">水温：<?php echo $water_temp_now . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">塩分濃度：<?php echo $salinity_now . "％"; ?></span>
+        <span class="abc" style="background-color:#000000">溶存酸素濃度：<?php echo $do_now . ""; ?></span>
       </div>
 
     </font>
@@ -341,7 +331,7 @@ $mysqli->close();
 
 </html>
 <script>
-  var complexChartOption1 = {
+  var complexChartOption1 = {    //上側グラフの設定
     responsive: false,
     maintainAspectRatio: false,
     scales: {
@@ -364,8 +354,8 @@ $mysqli->close();
           labelString: "気温・水温（℃）"
         },
         ticks: {
-          max: 50, //<?php echo $max[1] + 10; ?>,
-          min: -10, //<?php echo $min[1] - 10; ?>,
+          max: 50,
+          min: -10,
           stepSize: 10
         },
         gridLines: {
@@ -374,7 +364,7 @@ $mysqli->close();
       }],
     }
   };
-  var complexChartOption2 = {
+  var complexChartOption2 = {    //下側グラフの設定
     responsive: false,
     maintainAspectRatio: false,
     scales: {
@@ -397,8 +387,8 @@ $mysqli->close();
           labelString: "塩分濃度（％）"
         },
         ticks: {
-          max: 5, //<?php echo $max[1] + 10; ?>,
-          min: 0, //<?php echo $min[1] - 10; ?>,
+          max: 5,
+          min: 0,
           stepSize: 1
         },
       }, {
@@ -410,8 +400,8 @@ $mysqli->close();
           labelString: "溶存酸素濃度"
         },
         ticks: {
-          max: 15.0, //<?php echo $max[2] + 10; ?>,
-          min: 0.0, //<?php echo $min[2] - 10; ?>,
+          max: 15.0,
+          min: 0.0,
           stepSize: 1.0
         },
         gridLines: {
@@ -432,19 +422,19 @@ $mysqli->close();
       labels: [<?php echo $label; ?>],
       datasets: [{
           type: "line",
-          label: "土壌温度(℃)",
-          data: [<?php echo $result1; ?>],
-          borderColor: "rgba(255, 255, 0,0.4)",
-          backgroundColor: "rgba(255, 255, 0,0.4)",
-          fill: false, // 中の色を抜く
+          label: "水温(℃)",
+          data: [<?php echo $water_temp; ?>],
+          borderColor: "rgba(0, 255, 255,0.4)",
+          backgroundColor: "rgba(0, 255, 255,0.4)",
+          fill: false, // 中の色を抜く　
           yAxisID: "y-axis-1",
         },
         {
           type: "line",
           label: "気温(℃)",
-          data: [<?php echo $result1; ?>],
-          borderColor: "rgba(0,255,255,0.4)",
-          backgroundColor: "rgba(0,255,255,0.4)",
+          data: [<?php echo $water_temp; ?>],
+          borderColor: "rgba(255,255,0,0.4)",
+          backgroundColor: "rgba(255,255,0,0.4)",
           fill: false, // 中の色を抜く
           yAxisID: "y-axis-1",
         }
@@ -463,7 +453,7 @@ $mysqli->close();
       datasets: [{
           type: "line",
           label: "塩分濃度(%)",
-          data: [<?php echo $result2; ?>],
+          data: [<?php echo $salinity; ?>],
           borderColor: "rgba(0, 255, 0,0.4)",
           backgroundColor: "rgba(0, 255, 0,0.4)",
           fill: false, // 中の色を抜く
@@ -472,7 +462,7 @@ $mysqli->close();
         {
           type: "bar",
           label: "溶存酸素濃度",
-          data: [<?php echo $result3; ?>],
+          data: [<?php echo $do; ?>],
           borderColor: "rgba(128,128,0,0.4)",
           backgroundColor: "rgba(128,128,0,0.4)",
           fill: false, // 中の色を抜く
