@@ -76,7 +76,6 @@ if (file_exists("/var/www/html/infos/" . $dateStr . ".dat")) {
   $label;
   $temperature;
   $humidity;
-  $water_temp;
   foreach ($data as $row) {
     $row = preg_replace("/\n/", "", $row);
     $tmp = explode(",", $row);
@@ -127,16 +126,14 @@ for ($i = 0; $i < 1440; $i++) {
 }
 
 // MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
-$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'FARM_IoT');
-$sql = "select substring(date_format(TIME,'%H:%i'),1,4) AS JIKAN,round(AVG(SOIL_TEMP),2) as SOIL_TEMP,round(AVG(SOIL_WET),2) as SOIL_WET,round(AVG(SOIL_EC),2) as SOIL_EC,round(AVG(AIR_TEMP_1),2) as AIR_TEMP1,round(AVG(AIR_WET),2) as AIR_WET from farm where DAY = '";
+$mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
+$sql = "select substring(date_format(time,'%H:%i'),1,4) AS JIKAN,round(AVG(water_temp),2) as water_temp,round(AVG(salinity),2) as salinity,round(AVG(do),2) as do from ksfoods.data where day = '";
 $sql = $sql . str_replace("/", "-", $org_date);
-$sql = $sql . "' group by substring(date_format(TIME,'%H:%i'),1,4) order by JIKAN";
+$sql = $sql . "' group by substring(date_format(time,'%H:%i'),1,4) order by JIKAN";
 $res = $mysqli->query($sql);
-$result1 = "";
-$result2 = "";
-$result3 = "";
-$result4 = "";
-$result5 = "";
+$result1 = "";  //water_temp
+$result2 = "";  //salinity
+$result3 = "";  //do
 
 $i_next = 0;
 $j_next = 0;
@@ -147,9 +144,7 @@ while ($row = $res->fetch_array()) {
         $result1 = $result1 . $row[1] . ",";
         $result2 = $result2 . $row[2] . ",";
         $result3 = $result3 . $row[3] . ",";
-        $result4 = $result4 . $row[4] . ",";
-        $result5 = $result5 . $row[5] . ",";
-        if ($j == 5) {
+        if ($j == 3) {
           $j_next = 0;
           $i_next = $i + 1;
         } else {
@@ -161,18 +156,14 @@ while ($row = $res->fetch_array()) {
         $result1 = $result1 . ",";
         $result2 = $result2 . ",";
         $result3 = $result3 . ",";
-        $result4 = $result4 . ",";
-        $result5 = $result5 . ",";
-        if ($j == 5) {
+        if ($j == 3) {
           $j_next = 0;
         }
       } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
         $result1 = $result1 . ",";
         $result2 = $result2 . ",";
         $result3 = $result3 . ",";
-        $result4 = $result4 . ",";
-        $result5 = $result5 . ",";
-        if ($j == 5) {
+        if ($j == 3) {
           $j_next = 0;
         }
       }
@@ -181,17 +172,17 @@ while ($row = $res->fetch_array()) {
 }
 
 //MySQLより最新の測定値情報を取得
-$sql = "select * from farm order by day desc,time desc limit 1";
+$sql = "select * from ksfoods.data order by day desc,time desc limit 1";
 $res = $mysqli->query($sql);
 $row = $res->fetch_array();
 
-$day = $row[0];
-$time = $row[1];
-$soil_temp = $row[2];
-$soil_wet = $row[3];
-$soil_ec = $row[4];
-$air_temp = $row[5];
-$air_wet = $row[6];
+$fact_id = $row[0];
+$tank_no = $row[1];
+$day = $row[2];
+$time = $row[3];
+$water_temp = $row[4];
+$salinity = $row[5];
+$do = $row[6];
 
 $mysqli->close();
 
@@ -333,11 +324,10 @@ $mysqli->close();
     <font color="white" size="5">
       <div align="center">
         <span class="abc" style="background-color:#000000"><?php echo $day . " " . substr($time, 0, 5) . " 時点"; ?></span>
-        <span class="abc" style="background-color:#000000">土壌温度：<?php echo $soil_temp . "℃"; ?></span>
-        <span class="abc" style="background-color:#000000">土壌湿度：<?php echo $soil_wet . "％"; ?></span>
-        <span class="abc" style="background-color:#000000">電気伝導度：<?php echo $soil_ec . "mS/cm"; ?></span>
-        <span class="abc" style="background-color:#000000">気温：<?php echo $air_temp . "℃"; ?></span>
-        <span class="abc" style="background-color:#000000">湿度：<?php echo $air_wet . "％"; ?></span>
+        <span class="abc" style="background-color:#000000">気温：<?php echo $water_temp . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">水温：<?php echo $water_temp . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">塩分濃度：<?php echo $salinity . "％"; ?></span>
+        <span class="abc" style="background-color:#000000">溶存酸素濃度：<?php echo $do . ""; ?></span>
       </div>
 
     </font>
@@ -355,7 +345,7 @@ $mysqli->close();
     responsive: false,
     maintainAspectRatio: false,
     scales: {
-      xAxes: [ // Ｘ軸設定
+      xAxes: [ // 　Ｘ軸設定
         {
           display: true,
           barPercentage: 1,
@@ -371,7 +361,7 @@ $mysqli->close();
         position: "left",
         scaleLabel: {
           display: true,
-          labelString: "気温（℃）"
+          labelString: "気温・水温（℃）"
         },
         ticks: {
           max: 50, //<?php echo $max[1] + 10; ?>,
@@ -404,12 +394,12 @@ $mysqli->close();
         position: "left",
         scaleLabel: {
           display: true,
-          labelString: "湿度（％）"
+          labelString: "塩分濃度（％）"
         },
         ticks: {
-          max: 100, //<?php echo $max[1] + 10; ?>,
+          max: 5, //<?php echo $max[1] + 10; ?>,
           min: 0, //<?php echo $min[1] - 10; ?>,
-          stepSize: 10
+          stepSize: 1
         },
       }, {
         id: "y-axis-2",
@@ -417,12 +407,12 @@ $mysqli->close();
         position: "right",
         scaleLabel: {
           display: true,
-          labelString: "電気伝導度EC(mS/cm)"
+          labelString: "溶存酸素濃度"
         },
         ticks: {
-          max: 2.0, //<?php echo $max[2] + 10; ?>,
+          max: 15.0, //<?php echo $max[2] + 10; ?>,
           min: 0.0, //<?php echo $min[2] - 10; ?>,
-          stepSize: 0.2
+          stepSize: 1.0
         },
         gridLines: {
           drawOnChartArea: false,
@@ -435,7 +425,7 @@ $mysqli->close();
 <script>
   var ctx = document.getElementById("myChart1").getContext("2d");
   ctx.canvas.width = window.innerWidth - 69;
-  ctx.canvas.height = 250;
+  ctx.canvas.height = 350;
   var myChart = new Chart(ctx, {
     type: "bar",
     data: {
@@ -452,7 +442,7 @@ $mysqli->close();
         {
           type: "line",
           label: "気温(℃)",
-          data: [<?php echo $result4; ?>],
+          data: [<?php echo $result1; ?>],
           borderColor: "rgba(0,255,255,0.4)",
           backgroundColor: "rgba(0,255,255,0.4)",
           fill: false, // 中の色を抜く
@@ -465,37 +455,28 @@ $mysqli->close();
 
   var ctx = document.getElementById("myChart2").getContext("2d");
   ctx.canvas.width = window.innerWidth - 20;
-  ctx.canvas.height = 250;
+  ctx.canvas.height = 350;
   var myChart = new Chart(ctx, {
     type: "bar",
     data: {
       labels: [<?php echo $label; ?>],
       datasets: [{
           type: "line",
-          label: "電気伝導度EC(ms/cm)",
-          data: [<?php echo $result3; ?>],
+          label: "塩分濃度(%)",
+          data: [<?php echo $result2; ?>],
           borderColor: "rgba(0, 255, 0,0.4)",
           backgroundColor: "rgba(0, 255, 0,0.4)",
           fill: false, // 中の色を抜く
-          yAxisID: "y-axis-2",
-        },
-        {
-          type: "bar",
-          label: "土壌湿度(％)",
-          data: [<?php echo $result2; ?>],
-          borderColor: "rgba(128,0,128,0.4)",
-          backgroundColor: "rgba(128,0,128,0.4)",
-          fill: false, // 中の色を抜く
           yAxisID: "y-axis-1",
         },
         {
           type: "bar",
-          label: "湿度(％)",
-          data: [<?php echo $result5; ?>],
+          label: "溶存酸素濃度",
+          data: [<?php echo $result3; ?>],
           borderColor: "rgba(128,128,0,0.4)",
           backgroundColor: "rgba(128,128,0,0.4)",
           fill: false, // 中の色を抜く
-          yAxisID: "y-axis-1",
+          yAxisID: "y-axis-2",
         }
       ]
     },
