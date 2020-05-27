@@ -67,6 +67,9 @@ def system_info():
     print(now)
     print(day)
     print(d_time)
+    print(now2)
+    print(day2)
+    print(d_time2)
     print(data_dir)
     print(cloud_server_dir)
     print(cloud_server_address)
@@ -85,6 +88,7 @@ def system_info():
 
 
 
+
 def get_camera_rstp():
     """
     カメラ情報を取得する関数
@@ -93,7 +97,7 @@ def get_camera_rstp():
     global connect_ini
 
     config = configparser.ConfigParser()
-    config.read(connect_ini)                                            # 接続情報ini
+    config.read(connect_ini)                                              # 接続情報ini
     camera_user = config.get('camera', 'camera_user')                     # カメラユーザID
     camera_pass = config.get('camera', 'camera_pass')                     # カメラパスワード
     camera_list = config.get('camera', 'camera_list')                     # カメラ台数
@@ -108,11 +112,11 @@ def get_camera_rstp():
     url = []
     for i in range(int(camera_list)):
         #print(i)
-        if int(camera_type[i]) == 1:
+        if int(camera_type[i]) == 1:          # 陸上の場合 Hikvision
             url.append('rtsp://' + camera_user + ':' + camera_pass + '@' + camera_address[i] + '/554/Streaming/Channels/1')
             #print(url[i])
             i = i + 1
-        elif int(camera_type[i]) == 2:
+        elif int(camera_type[i]) == 2:        # 水中の場合 barlus
             url.append('rtsp://' + camera_address[i] + '/user=' + camera_user + '_password=' +camera_pass + '_channel=1_stream=1.sdp')
             #print(url[i])
             i = i + 1
@@ -172,6 +176,18 @@ def get_daytime():
     return daytime
 
 
+def get_daytime2():
+    """
+    日付時刻情報を取得する関数(セパレート記号付き)
+    """
+
+    now2 = datetime.datetime.now()
+    day2 = now2.strftime('%Y/%m/%d')                                # 0 日付YY/MM/DD
+    d_time2 = now2.strftime('%H:%M')                                # 1 時刻HH:MM
+    daytime2 = [day2, d_time2]
+    #print(daytime2)
+    return daytime2
+
 def get_image_info():
     """
     画質情報を取得する関数
@@ -183,7 +199,7 @@ def get_image_info():
     config.read(quality_ini)
     org = config.get('image_info', 'org')                       # 0 撮影オリジナル
     upload = config.get('image_info', 'upload')                 # 1 アップロード用
-    mini = config.get('image_info', 'mini')                    # 2 サムネイル用
+    mini = config.get('image_info', 'mini')                     # 2 サムネイル用
     #print(image_info)
     return org, upload, mini
 
@@ -206,6 +222,47 @@ def get_ssh_connect():
 
     # SSH接続情報のreturn
     return server_address, server_port, ssh_username, ssh_pass, ssh_key, access_port
+
+
+def get_factory_info():
+    """
+    施設情報を取得する関数
+    """
+    global system_ini
+    config = configparser.ConfigParser()
+    config.read(system_ini)
+    fact_id = config.get('factory_info', 'factory_id')       # 0 施設ID
+    tank_list = config.get('factory_info', 'tank_list')      # 1 水槽数
+    return fact_id, tank_list
+
+
+def get_mysql_connect():
+    """
+    mysql接続情報を取得する関数
+    """
+    global connect_ini
+    config = configparser.ConfigParser()
+    config.read(connect_ini)
+    mysql_host = config.get('conn_mysql', 'host')           # 0 ホスト名
+    mysql_user = config.get('conn_mysql', 'user')           # 1 ユーザ名
+    mysql_password = config.get('conn_mysql', 'password')   # 2 パスワード
+    mysql_db = config.get('conn_mysql', 'db')               # 3 データベース
+    mysql_table = config.get('conn_mysql', 'table')         # 4 テーブル
+    mysql_charset = config.get('conn_mysql', 'charset')     # 5 エンコード
+    mysql_port = config.get('conn_mysql', 'port')           # 6 接続ポート
+    return mysql_host, mysql_user, mysql_password, mysql_db, mysql_table, mysql_charset, mysql_port
+
+
+def get_columns_info():
+    """
+    mysql接続情報を取得する関数
+    """
+    global connect_ini
+    config = configparser.ConfigParser()
+    config.read(connect_ini)
+    mysql_columns = config.get('columns_data', 'columns_data')
+    return mysql_columns
+
 
 # main関数を呼び出す（直接このスクリプトを呼び出した場合は全情報を出力するようにする
 if __name__ == '__main__':
