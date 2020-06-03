@@ -1,6 +1,6 @@
 <?php
 ini_set("max_execution_time", 180);
-// date_default_timezone_set('Asia/Tokyo');
+//date_default_timezone_set('Asia/Tokyo');
 
 session_start();
 if (!isset($_SESSION['USER'])) {
@@ -71,9 +71,9 @@ if (isset($_GET['date_to'])) {
 
 $dArray;
 
-$max =  array_fill(1, 10, -999);
-$min =  array_fill(1, 10, 999);
-$data = array();
+$max =  array_fill(1, 10, -999);   //$maxを[1]～[10]まで-999で埋める
+$min =  array_fill(1, 10, 999);    //$minを[1]～[10]まで 999で埋める
+$data = array();                   //$dataを配列として指定
 for ($i = 0; $i < 1440; $i++) {
   $h = str_pad(floor($i / 60), 2, 0, STR_PAD_LEFT);
   $m = str_pad(floor($i % 60), 2, 0, STR_PAD_LEFT);
@@ -113,26 +113,28 @@ for ($i = 0; $i < 1440; $i++) {
   }
 }
 
+
+//$set_labels = '00時', '01時', '02時', '03時', '04時', '05時', '06時', '07時', '08時', '09時', '10時', '11時', '12時', '13時', '14時',  '15時', '16時', '17時', '18時', '19時', '20時', '21時', '22時', '23時';
 // MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
 $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
-$sql = "select substring(date_format(time,'%H:%i'),1,4) AS JIKAN,round(AVG(water_temp),2) as water_temp,round(AVG(salinity),2) as salinity,round(AVG(do),2) as do from ksfoods.data where day = '";
+$sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, water_temp, salinity, do from ksfoods.data where day = '";
 $sql = $sql . str_replace("/", "-", $org_date);
-$sql = $sql . "' group by substring(date_format(time,'%H:%i'),1,4) order by JIKAN";
+$sql = $sql . "' group by substring(date_format(time,'%H:%i:%s'),1,8) order by JIKAN";
 $res = $mysqli->query($sql);
 $water_temp = "";   //水温
 $salinity = "";     //塩分濃度
 $do = "";           //溶存酸素濃度
 
-$i_next = 0;
-$j_next = 0;
+$i_next = 0;  //時間　MAX24
+$j_next = 0;  //10分毎　MAX5回分（50分）
 while ($row = $res->fetch_array()) {
-  for ($i = $i_next; $i < 25; $i++) {
-    for ($j = $j_next; $j < 6; $j++) {
+  for ($i = $i_next; $i < 25; $i++) {     //24時まで　
+    for ($j = $j_next; $j < 6; $j++) {    //50分まで
       if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
         $water_temp = $water_temp . $row[1] . ",";
         $salinity = $salinity . $row[2] . ",";
         $do = $do . $row[3] . ",";
-        if ($j == 3) {
+        if ($j == 5) {                    //50分まで来たらゼロにする
           $j_next = 0;
           $i_next = $i + 1;
         } else {
@@ -144,14 +146,14 @@ while ($row = $res->fetch_array()) {
         $water_temp = $water_temp . ",";
         $salinity = $salinity . ",";
         $do = $do . ",";
-        if ($j == 3) {
+        if ($j == 5) {                    //50分まで来たらゼロにする
           $j_next = 0;
         }
       } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
         $water_temp = $water_temp . ",";
         $salinity = $salinity . ",";
         $do = $do . ",";
-        if ($j == 3) {
+        if ($j == 5) {                    //50分まで来たらゼロにする
           $j_next = 0;
         }
       }
@@ -161,23 +163,77 @@ while ($row = $res->fetch_array()) {
 
 //MySQLより最新の測定値情報を取得
 $sql = "select * from ksfoods.data order by day desc,time desc limit 1";
-$res = $mysqli->query($sql);
-$row = $res->fetch_array();
-
+$res3 = $mysqli->query($sql);
+$row3 = $res3->fetch_array();
 
 // ここで取得した値はグラフ上側の現在値の表示に利用します
-$fact_id = $row[0];
-$tank_no = $row[1];
-$day_now = $row[2];
-$time_now = $row[3];
-$water_temp_now = $row[4];
-$salinity_now = $row[5];
-$do_now = $row[6];
+$fact_id = $row3[0];
+$tank_no = $row3[1];
+$day_now = $row3[2];
+$time_now = $row3[3];
+$water_temp_now = $row3[4];
+$salinity_now = $row3[5];
+$do_now = $row3[6];
 
+
+//AMeDASからのデータ処理
+$sql2 = "select substring(date_format(time,'%H:%i'),1,4) AS JIKAN,round(AVG(temp),2) as temp from ksfoods.area_info where day = '";
+$sql2 = $sql2 . str_replace("/", "-", $org_date);
+$sql2 = $sql2 . "' group by substring(date_format(time,'%H:%i'),1,4) order by JIKAN;";
+$res2 = $mysqli->query($sql2);
+$air_temp = "";     //志津川気温
+
+$i_next = 0;
+$j_next = 0;
+while ($row2 = $res2->fetch_array()) {
+  for ($i = $i_next; $i < 25; $i++) {
+    for ($j = $j_next; $j < 6; $j++) {
+      if (substr($row2[0], 0, 2) == $i and substr($row2[0], 3, 1) == $j) {
+        $air_temp = $air_temp . $row2[1] . ",";
+        if ($j == 3) {
+          $j_next = 0;
+          $i_next = $i + 1;
+        } else {
+          $j_next = $j + 1;
+          $i_next = $i;
+        }
+        break 2;
+      } elseif (substr($row2[0], 0, 2) > $i) {
+        $air_temp = $air_temp . ",";
+        if ($j == 3) {
+          $j_next = 0;
+        }
+      } elseif (substr($row2[0], 0, 2) >= $i and substr($row2[0], 3, 1) > $j) {
+        $air_temp = $air_temp . ",";
+        if ($j == 3) {
+          $j_next = 0;
+        }
+      }
+    }
+  }
+}
+
+//AMeDASからのデータ回収
+$sql2 = "select * from ksfoods.area_info order by day desc,time desc limit 1;";
+$res2 = $mysqli->query($sql2);
+$row2 = $res2->fetch_array();
+
+$air_temp_now = $row2[3];
+
+//みやぎ水産naviからのデータ回収
+$sql3 = "select * from ksfoods.miyagi_navi_watertemp order by day limit 1;";
+$res3 = $mysqli->query($sql3);
+$row3 = $res3->fetch_array();
+$uta_date = $row3[0];
+$uta_temp_10 = $row3[1];
+$uta_temp_15 = $row3[2];
+
+//接続終了
 $mysqli->close();
 
-
+//ここまで処理用
 ?>
+
 <!DOCTYPE html>
 <html>
 
@@ -311,13 +367,17 @@ $mysqli->close();
   </style>
 
   <strong>
-    <font color="white" size="5">
+    <font color="white" size="4">
       <div align="center">
         <span class="abc" style="background-color:#000000"><?php echo $day_now . " " . substr($time, 0, 5) . " 時点"; ?></span>
-        <span class="abc" style="background-color:#000000">気温：<?php echo $water_temp_now . "℃"; ?></span>
-        <span class="abc" style="background-color:#000000">水温：<?php echo $water_temp_now . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">志津川気温：<?php echo $air_temp_now . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">水槽水温：<?php echo $water_temp_now . "℃"; ?></span>
         <span class="abc" style="background-color:#000000">塩分濃度：<?php echo $salinity_now . "％"; ?></span>
-        <span class="abc" style="background-color:#000000">溶存酸素濃度：<?php echo $do_now . ""; ?></span>
+        <span class="abc" style="background-color:#000000">溶存酸素濃度：<?php echo $do_now . ""; ?></span><br><br>
+        <span class="abc" style="background-color:#000000">歌津水温 最終更新日：<?php echo $uta_date; ?></span>
+        <span class="abc" style="background-color:#000000">10時：<?php echo $uta_temp_10 . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">15時：<?php echo $uta_temp_15 . "℃"; ?></span>$uta_date
+
       </div>
 
     </font>
@@ -331,17 +391,22 @@ $mysqli->close();
 
 </html>
 <script>
-  var complexChartOption1 = {    //上側グラフの設定
+  var complexChartOption1 = {    //上側グラフの設定　
     responsive: false,
     maintainAspectRatio: false,
     scales: {
       xAxes: [ // 　Ｘ軸設定
         {
           display: true,
-          barPercentage: 1,
+          barPercentage: 0.8,
           //categoryPercentage: 1.8,
           gridLines: {
             display: false
+          },
+            ticks: {
+            //max: 144,
+            //min: 0,
+            //stepSize: 60
           },
         }
       ],
@@ -371,7 +436,7 @@ $mysqli->close();
       xAxes: [ // Ｘ軸設定
         {
           display: true,
-          barPercentage: 0.9,
+          barPercentage: 0.8,
           //categoryPercentage: 1.8,
           gridLines: {
             display: false
@@ -415,7 +480,7 @@ $mysqli->close();
 <script>
   var ctx = document.getElementById("myChart1").getContext("2d");
   ctx.canvas.width = window.innerWidth - 69;
-  ctx.canvas.height = 350;
+  ctx.canvas.height = 320;
   var myChart = new Chart(ctx, {
     type: "bar",
     data: {
@@ -426,15 +491,16 @@ $mysqli->close();
           data: [<?php echo $water_temp; ?>],
           borderColor: "rgba(0, 255, 255,0.4)",
           backgroundColor: "rgba(0, 255, 255,0.4)",
-          fill: false, // 中の色を抜く　
+          fill: false, // 中の色を抜く
           yAxisID: "y-axis-1",
         },
         {
           type: "line",
-          label: "気温(℃)",
-          data: [<?php echo $water_temp; ?>],
-          borderColor: "rgba(255,255,0,0.4)",
-          backgroundColor: "rgba(255,255,0,0.4)",
+          label: "志津川気温(℃)",
+          data: [<?php echo $air_temp; ?>],
+          borderColor: "rgba(255,150,0,0.4)",
+          backgroundColor: "rgba(255,150,0,0.4)",
+          spanGaps: true,
           fill: false, // 中の色を抜く
           yAxisID: "y-axis-1",
         }
@@ -445,7 +511,7 @@ $mysqli->close();
 
   var ctx = document.getElementById("myChart2").getContext("2d");
   ctx.canvas.width = window.innerWidth - 20;
-  ctx.canvas.height = 350;
+  ctx.canvas.height = 320;
   var myChart = new Chart(ctx, {
     type: "bar",
     data: {
