@@ -24,7 +24,9 @@ $delete_word_1 = array("<tr><td>", "</td>");                    //タグ1
 $delete_word_2 = array("<td>", '<td class="num">');             //タグ2
 $array_data = str_replace($delete_word_1, "", $array_data);     //タグ1を削除
 $array_data = str_replace($delete_word_2, ",", $array_data);    //タグ2をカンマに
+$array_data = str_replace("―", "", $array_data);                //ハイフンがあったら削除する
 $array_data = explode(",", $array_data);                        //カンマで区切る　[0]日付情報　[3]歌津水温10時　[4]歌津水温15時
+
 
 
 //接続処理
@@ -37,9 +39,16 @@ $mysqli = new mysqli ($host_name, $user_name, $db_password, $db_name);
     }
 
 //mysql構文　insertとon duplicateで新規と更新を一文で行う
-$sql = 'insert into miyagi_navi_watertemp values ("'. $array_data[0] . '", "'. $array_data[3] . '", "'. $array_data[4];
-$sql = $sql . '") on duplicate key update day = "'. $array_data[0] . '", water_temp_10 ="';
-$sql = $sql . $array_data[3] . '", water_temp_15 = "'. $array_data[4] . '";';
+#$sql = 'update miyagi_navi_watertemp set day=,'. water_temp_10, water_temp_15) values ("'. $array_data[0] . '", "'. $array_data[3] . '", "'. $array_data[4] . '")';
+#$sql = 'update miyagi_navi_watertemp set day="'. $array_data[0] . '", water_temp_10="'. $array_data[3] . '", water_temp_15="'. $array_data[4] . '" ';
+
+#$sql = $sql . '") Replace Into update day = '. $array_data[0] . ', water_temp_10 ="' . $array_data[3];
+#$sql = $sql . '", water_temp_15 = "'. $array_data[4] . '";';
+#$sql=$sql. " where day BETWEEN '".date( "Y/m/d", time())."' and '". date( "Y/m/d", time())."';";
+$sql = 'Replace Into miyagi_navi_watertemp (day, water_temp_10, water_temp_15) values ("'. $array_data[0] . '", "'. $array_data[3] . '", "'. $array_data[4] . '");';
+#$sql=$sql. ' where day="' . $array_data[0]. '";';
+
+echo $sql;
 echo "\n". $sql  . "\n";
 $mysqli_result = $mysqli->query($sql);
     if (!$mysqli_result) {

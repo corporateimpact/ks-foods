@@ -170,7 +170,7 @@ foreach( $_rawData as $_rawBlock ) {
      //echo $rain_total . "\n";
 
      //mysql構文4　データ登録用
-     $sql = "insert into area_info values ( " . $area_no . ", " . $sc_date . ", " . $sc_time . ", " . (float)$sc_temp . ", " . (float)$sc_rain . ", " . (float)$rain_todayall . ", " . (float)$rain_total . ");";
+     $sql = "replace into area_info values ( " . $area_no . ", " . $sc_date . ", " . $sc_time . ", " . (float)$sc_temp . ", " . (float)$sc_rain . ", " . (float)$rain_todayall . ", " . (float)$rain_total . ");";
      //echo $sql . "\n";
 
      $mysqli_result = $mysqli->query($sql);
