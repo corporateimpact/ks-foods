@@ -61,7 +61,7 @@ $sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, are
 $res = $mysqli->query($sql);
 
 // ヘッダー作成
-echo "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\",\"気温\"\r\n";
+echo "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\"\r\n";
 
 
 while ($row = $res->fetch_array()) {

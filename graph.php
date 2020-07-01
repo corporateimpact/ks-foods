@@ -221,7 +221,7 @@ $row2 = $res2->fetch_array();
 $air_temp_now = $row2[3];
 
 //みやぎ水産naviからのデータ回収
-$sql3 = "select * from ksfoods.miyagi_navi_watertemp order by day limit 1;";
+$sql3 = "select * from ksfoods.miyagi_navi_watertemp order by day desc,day desc limit 1;";
 $res3 = $mysqli->query($sql3);
 $row3 = $res3->fetch_array();
 $uta_date = $row3[0];
