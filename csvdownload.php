@@ -55,13 +55,12 @@ $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 $mysqli->set_charset('utf8');
 
 //測定値テーブル抽出クエリ
-$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, area_info.temp FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day,data.time";
-// $sql = "SELECT day, time, water_temp, salinity, do FROM data WHERE day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY day,time";
+$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, area_info.temp FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
 
 $res = $mysqli->query($sql);
 
 // ヘッダー作成
-echo "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\"\r\n";
+echo "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\",\"志津川気温\"\r\n";
 
 
 while ($row = $res->fetch_array()) {
