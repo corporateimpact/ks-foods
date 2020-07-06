@@ -4,13 +4,14 @@
 各センサーデータを集積する処理
 """
 import t3_do_logger
-#import actw_wtemp_logger
+import actw_wtemp_logger
 import set_info
 import sys
 import err
+import subprocess
 
 do_average = None
-water_temp_data = None
+water_salt_data = None
 salinity_data = None
 daytime = None
 factory_info = None
@@ -20,10 +21,11 @@ def get_sensor_data():
     各データを格納する関数
     """
     global do_average
-    global water_temp_data
+    global water_salt_data
     global salinity_data
     global daytime
     global factory_info
+    # DO値
     do_data = t3_do_logger.main()
     do_1 = do_data[0]
     do_2 = do_data[1]
@@ -33,12 +35,13 @@ def get_sensor_data():
         err.main()
         sys.exit()
     do_average = round(((float(do_1) + float(do_2) + float(do_3)) / do_denominator), 2) # n回計測からの平均値
-    #water_temp_data = actw_wtemp_logger.get_water_temp()
-    #salinity_data = actw_wtemp_logger.get_salinity_data()
-    # ↓センサーが来るまでのダミー処理
-    water_temp_data = 15.0
-    salinity_data = 2.9
-    # センサーが届いたら↑二つは削除する
+    # 水温と塩分濃度
+    water_salt_data = actw_wtemp_logger.main()
+    water_temp_data = water_salt_data[3]
+    salinity_data = float(water_salt_data[4]) / 10
+    #water_temp_data = 15.0
+    #salinity_data = 2.9
+    # その他情報
     daytime = set_info.get_daytime2()             # 0 日付 1 時刻 (セパレート記号付き)
     factory_info = set_info.get_factory_info()    # 0 施設ID 2 水槽数
     # 0 施設ID 1 水槽数 2 日付 3 時刻 4 水温 5 塩分濃度 6 溶存酸素濃度

@@ -11,9 +11,9 @@ import json
 
 # 情報を読み込んで整理するやつ
 # 読み込むiniファイル
-system_ini = '/home/pi/mainsys/system.ini'
-connect_ini = '/home/pi/mainsys/connect.ini'
-quality_ini = '/home/pi/mainsys/quality.ini'
+system_ini = '/home/kanetapi/mainsys/system.ini'
+connect_ini = '/home/kanetapi/mainsys/connect.ini'
+quality_ini = '/home/kanetapi/mainsys/quality.ini'
 
 
 def main():
@@ -44,13 +44,13 @@ def system_info():
     now = datetime.datetime.now()
     day = now.strftime('%Y%m%d')
     d_time = now.strftime('%H%M')
-    config.read(system_ini)                                             # システム情報ini
+    config.read(system_ini)                                               # システム情報ini
     data_dir = config.get('sys_info', 'data_dir')                         # ローカル
     cloud_server_dir = config.get('sys_info', 'cloud_server_dir')         # クラウドサーバdir
-    cloud_server_address = config.get('sys_info', 'cloud_server_address')       # クラウドサーバaddress
+    cloud_server_address = config.get('sys_info', 'cloud_server_address') # クラウドサーバaddress
     cloud_server_pass = config.get('sys_info', 'cloud_server_pass')       # クラウドサーバpass
     # 各種接続情報読み込み
-    config.read(connect_ini)                                            # 接続情報ini
+    config.read(connect_ini)                                              # 接続情報ini
     ssh_username = config.get('conn_ssh', 'ssh_username')                 # SSHユーザ名
     ssh_key = config.get('conn_ssh', 'ssh_key')                           # 鍵
     camera_user = config.get('camera', 'camera_user')                     # カメラユーザID
@@ -60,9 +60,9 @@ def system_info():
     camera_type = json.loads(config.get('camera', 'camera_type'))         # カメラ属性　1陸　2水中
     config = configparser.ConfigParser()
     config.read(quality_ini)
-    org = config.get('image_info', 'org')                       # 0 撮影オリジナル
-    upload = config.get('image_info', 'upload')                 # 1 アップロード用
-    mini = config.get('image_info', 'mini')                    # 2 サムネイル用
+    org = config.get('image_info', 'org')                                 # 0 撮影オリジナル
+    upload = config.get('image_info', 'upload')                           # 1 アップロード用
+    mini = config.get('image_info', 'mini')                               # 2 サムネイル用
     # ALL出力
     print(now)
     print(day)
@@ -154,10 +154,11 @@ def get_dir_info():
 
     config = configparser.ConfigParser()
     config.read(system_ini)
-    main_dir = config.get('sys_info', 'main_dir')                   # 0 メインシステムのディレクトリ
-    data_dir = config.get('sys_info', 'data_dir')                   # 1 ローカルデータのディレクトリ
-    cloud_server_dir = config.get('sys_info', 'cloud_server_dir')   # 2 クラウドサーバのディレクトリ
-    dir_info = [main_dir, data_dir, cloud_server_dir]
+    main_dir = config.get('sys_info', 'main_dir')                               # 0 メインシステムのディレクトリ
+    data_dir = config.get('sys_info', 'data_dir')                               # 1 ローカルデータのディレクトリ
+    cloud_server_dir = config.get('sys_info', 'cloud_server_dir')               # 2 クラウドサーバのディレクトリ(image)
+    cloud_server_dir_infos = config.get('sys_info', 'cloud_server_dir_info')    # 3 クラウドサーバのディレクトリ(info)
+    dir_info = [main_dir, data_dir, cloud_server_dir, cloud_server_dir_infos]
     #print(dir_info)
     return dir_info
 
@@ -182,8 +183,8 @@ def get_daytime2():
     """
 
     now2 = datetime.datetime.now()
-    day2 = now2.strftime('%Y/%m/%d')                                # 0 日付YY/MM/DD
-    d_time2 = now2.strftime('%H:%M')                                # 1 時刻HH:MM
+    day2 = now2.strftime('%Y-%m-%d')                            # 0 日付YY-MM-DD
+    d_time2 = now2.strftime('%H:%M') + ":00"                    # 1 時刻HH:MM
     daytime2 = [day2, d_time2]
     #print(daytime2)
     return daytime2
