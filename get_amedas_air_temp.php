@@ -118,7 +118,7 @@ foreach( $_rawData as $_rawBlock ) {
      }
 
      // mysql構文1　直前の降水量データを取得
-     $sql = 'select rain_hour from ksfoods.area_info order by rain_hour desc limit 1;';
+     $sql = 'select rain_hour from ksfoods.area_info order by day desc, time desc limit 1;';
      $rain_before_row = $mysqli->query($sql);
      if (!$rain_before_row) {
          die('select fault'.mysql_error());
@@ -128,7 +128,7 @@ foreach( $_rawData as $_rawBlock ) {
 
 
      // mysql構文2　最新の総雨量データを取得
-     $sql = 'select rain_total from ksfoods.area_info order by rain_total desc limit 1;';
+     $sql = 'select rain_total from ksfoods.area_info order by day desc, time desc limit 1;';
      $rain_total_row = $mysqli->query($sql);
      if (!$rain_total_row) {
          die('select fault'.mysql_error());
@@ -138,7 +138,7 @@ foreach( $_rawData as $_rawBlock ) {
      $rain_total = $rain_total_row[0];
 
      // mysql構文3　当日の降水量データを取得
-     $sql = "SELECT DATE_FORMAT(day, '%Y/%m/%d') AS day, SUM(rain_hour) AS rain_todayall FROM ksfoods.area_info where day=date(now()) ;";
+     $sql = "select sum(rain_hour) from ksfoods.area_info where day=date(now());";
      $rain_todayall_row = $mysqli->query($sql);
      if (!$rain_todayall_row) {
          die('select fault'.mysql_error());

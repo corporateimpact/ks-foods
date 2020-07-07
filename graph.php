@@ -214,11 +214,16 @@ while ($row2 = $res2->fetch_array()) {
 }
 
 //AMeDASからのデータ回収
-$sql2 = "select * from ksfoods.area_info order by day desc,time desc limit 1;";
+$sql2 = "select * from ksfoods.area_info order by day desc, time desc limit 1;";
 $res2 = $mysqli->query($sql2);
 $row2 = $res2->fetch_array();
 
+
 $air_temp_now = $row2[3];
+$rain_hour_now = $row2[4];
+$rain_today_now = $row2[5];
+$rain_total_ow = $row2[6];
+
 
 //みやぎ水産naviからのデータ回収
 $sql3 = "select * from ksfoods.miyagi_navi_watertemp order by day desc,day desc limit 1;";
@@ -231,6 +236,11 @@ $uta_temp_15 = $row3[2];
 //接続終了
 $mysqli->close();
 
+//表示用の日付処理
+$daycount = date("Y/m/d H:i:s");
+$one_day_ago = date("Y/m/d", strtotime('-1 day', $daycount));
+$two_day_ago = date("Y/m/d", strtotime('-2 day', $daycount));
+$thr_day_ago = date("Y/m/d", strtotime('-3 day', $daycount));
 //ここまで処理用
 ?>
 
@@ -364,7 +374,17 @@ $mysqli->close();
     span.abc {
       display: inline-block;
     }
+    table th{
+        padding : 10px 10px;
+    }
+    table td{
+        padding : 10px 10px;
+    }
+    th,td{
+        border:solid 1px #aaaaaa;
+    }
   </style>
+
 
   <strong>
     <font color="white" size="4">
@@ -374,9 +394,12 @@ $mysqli->close();
         <span class="abc" style="background-color:#000000">水槽水温：<?php echo $water_temp_now . "℃"; ?></span>
         <span class="abc" style="background-color:#000000">塩分濃度：<?php echo $salinity_now . "％"; ?></span>
         <span class="abc" style="background-color:#000000">溶存酸素濃度：<?php echo $do_now . ""; ?></span><br><br>
+        <span class="abc" style="background-color:#000000">一時間の雨量：<?php echo $rain_hour_now . "ml"; ?></span>
+        <span class="abc" style="background-color:#000000">現在総雨量：<?php echo $rain_total_now . "ml"; ?></span>
+        <span class="abc" style="background-color:#000000">本日の総雨量：<?php echo $rain_today_now . "ml"; ?></span><br><br>
         <span class="abc" style="background-color:#000000">歌津水温 最終更新日：<?php echo $uta_date; ?></span>
         <span class="abc" style="background-color:#000000">10時：<?php echo $uta_temp_10 . "℃"; ?></span>
-        <span class="abc" style="background-color:#000000">15時：<?php echo $uta_temp_15 . "℃"; ?></span>$uta_date
+        <span class="abc" style="background-color:#000000">15時：<?php echo $uta_temp_15 . "℃"; ?></span>
 
       </div>
 
@@ -411,21 +434,37 @@ $mysqli->close();
         }
       ],
       yAxes: [{
-        id: "y-axis-1",
-        type: "linear",
-        position: "left",
-        scaleLabel: {
-          display: true,
-          labelString: "気温・水温（℃）"
-        },
-        ticks: {
-          max: 50,
-          min: -10,
-          stepSize: 10
-        },
-        gridLines: {
+          id: "y-axis-1",
+          type: "linear",
+          position: "left",
+          scaleLabel: {
+              display: true,
+              labelString: "気温（℃）"
+          },
+          ticks: {
+              max: 35,
+              min: 0,
+              stepSize: 5
+          },
+          gridLines: {
           drawOnChartArea: true,
-        }
+          }
+      }, {
+          id: "y-axis-2",
+          type: "linear",
+          position: "right",
+          scaleLabel: {
+              display: true,
+              labelString: "水温"
+          },
+          ticks: {
+              max: 25.0,
+              min: 5.0,
+              stepSize: 5.0
+          },
+          gridLines: {
+              drawOnChartArea: false,
+          }
       }],
     }
   };
@@ -466,7 +505,7 @@ $mysqli->close();
         },
         ticks: {
           max: 15.0,
-          min: 0.0,
+          min: 5.0,
           stepSize: 1.0
         },
         gridLines: {
@@ -479,7 +518,7 @@ $mysqli->close();
 
 <script>
   var ctx = document.getElementById("myChart1").getContext("2d");
-  ctx.canvas.width = window.innerWidth - 69;
+  ctx.canvas.width = window.innerWidth - 20;
   ctx.canvas.height = 320;
   var myChart = new Chart(ctx, {
     type: "bar",
@@ -492,7 +531,7 @@ $mysqli->close();
           borderColor: "rgba(0, 255, 255,0.4)",
           backgroundColor: "rgba(0, 255, 255,0.4)",
           fill: false, // 中の色を抜く
-          yAxisID: "y-axis-1",
+          yAxisID: "y-axis-2",
         },
         {
           type: "line",
