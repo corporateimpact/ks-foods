@@ -159,7 +159,7 @@ def set_mail_message():
         # SQLで取得したデータを変数へ格納。IDとフラグは保持しない
         # mail_id = mail_row[0]
         # mail_name = mail_row[1]
-        mail_address = mail_row[2]
+        mail_address = mail_row[3]
 
         print(mail_address)
 
