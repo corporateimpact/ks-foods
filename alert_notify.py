@@ -49,7 +49,7 @@ def main():
     メイン関数
     """
     # メールサーバ接続処理
-    # init_smtp()
+    init_smtp()
 
     # データ取得処理を呼び出し
     get_data()
