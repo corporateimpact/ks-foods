@@ -146,7 +146,7 @@ def set_mail_message():
     else:
         mail_subject = subject_head
 
-    # mail_subject = subject_head + limit_tbl_item
+    mail_subject = subject_head + limit_tbl_item
     # メールの本文を作成する
     mail_body = line_message
 
@@ -177,7 +177,7 @@ def send_mail(to_address, str_subject, str_body):
                     (to_address, to_address, str_subject, str_body))
 
     # メール送信処理
-    # smtp.sendmail(smtp_addr, to_address, mail_message)
+    smtp.sendmail(smtp_addr, to_address, mail_message)
 
     print(mail_message)
 
