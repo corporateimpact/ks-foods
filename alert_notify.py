@@ -172,6 +172,10 @@ def send_mail(to_address, str_subject, str_body):
     メール送信を行う処理
     """
 
+    print("address:" + to_address)
+    print("subject:" + str_subject)
+    print("body:"+ str_body)
+
     # 送信メールの本文を作成する
     mail_message = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s" %
                     (to_address, to_address, str_subject, str_body))
