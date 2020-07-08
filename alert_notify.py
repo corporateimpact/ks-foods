@@ -49,7 +49,7 @@ def main():
     メイン関数
     """
     # メールサーバ接続処理
-    # init_smtp()
+    init_smtp()
 
     # データ取得処理を呼び出し
     get_data()
@@ -146,7 +146,7 @@ def set_mail_message():
     else:
         mail_subject = subject_head
 
-    # mail_subject = subject_head + limit_tbl_item
+    mail_subject = subject_head + limit_tbl_item
     # メールの本文を作成する
     mail_body = line_message
 
@@ -159,7 +159,7 @@ def set_mail_message():
         # SQLで取得したデータを変数へ格納。IDとフラグは保持しない
         # mail_id = mail_row[0]
         # mail_name = mail_row[1]
-        mail_address = mail_row[2]
+        mail_address = mail_row[3]
 
         print(mail_address)
 
@@ -172,12 +172,16 @@ def send_mail(to_address, str_subject, str_body):
     メール送信を行う処理
     """
 
+    print("address:" + to_address)
+    print("subject:" + str_subject)
+    print("body:"+ str_body)
+
     # 送信メールの本文を作成する
     mail_message = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s" %
                     (to_address, to_address, str_subject, str_body))
 
     # メール送信処理
-    # smtp.sendmail(smtp_addr, to_address, mail_message)
+    smtp.sendmail(smtp_addr, to_address, mail_message.encode('utf-8'))
 
     print(mail_message)
 
@@ -257,10 +261,9 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
     else:
         # 測定値が最新の場合、しきい値チェック処理
         check_cur = common.connect_database_project()
-        update_cur = common.connect_database_project()
 
         # しきい値を取得するSQL
-        sel_check_sql = "SELECT * FROM m_limit WHERE item IN ('water_temp, 'salinity', 'do');"
+        sel_check_sql = "SELECT * FROM m_limit WHERE item IN ('water_temp', 'salinity', 'do');"
 
         check_cur.execute(sel_check_sql)
 
@@ -316,8 +319,11 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
 
             # リミットテーブルの更新
             upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
+            update_cur = common.connect_database_project()
             update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
+            update_cur.close()
 
+        check_cur = common.connect_database_project()
         # リミットテーブルの更新（測定値、取得再開の判断）
         check_cur.execute("select * from m_limit where item = 'SYSTEM';")
         for row in check_cur.fetchall():
@@ -325,12 +331,11 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
         if limit_tbl_flg == "NG":
             alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
             line_message = line_message + "\n計測が再開されました。"
+            update_cur = common.connect_database_project()
             # リミットテーブルの更新
             update_cur.execute(
                 "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';")
-
-        check_cur.close()
-        update_cur.close()
+            update_cur.close()
 
 
 # メイン関数を実行
