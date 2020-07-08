@@ -259,7 +259,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
         check_cur = common.connect_database_project()
 
         # しきい値を取得するSQL
-        sel_check_sql = "SELECT * FROM m_limit WHERE item IN ('water_temp, 'salinity', 'do');"
+        sel_check_sql = "SELECT * FROM m_limit WHERE item IN ('water_temp', 'salinity', 'do');"
 
         check_cur.execute(sel_check_sql)
 
