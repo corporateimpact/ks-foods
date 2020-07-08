@@ -317,6 +317,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
             update_cur = common.connect_database_project()
             update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
+            update_cur.close()
 
         check_cur = common.connect_database_project()
         # リミットテーブルの更新（測定値、取得再開の判断）
@@ -330,9 +331,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             # リミットテーブルの更新
             update_cur.execute(
                 "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';")
-
-        check_cur.close()
-        update_cur.close()
+            update_cur.close()
 
 
 # メイン関数を実行
