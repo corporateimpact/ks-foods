@@ -50,7 +50,6 @@ if ($dl_date_to < $dl_date_from) {
 header("Content-Type: application/octet-stream");
 header("Content-Disposition: attachment; filename=" . str_replace("/", "", $dl_date_from) . "-" . str_replace("/", "", $dl_date_to) . ".csv");
 
-
 $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 $mysqli->set_charset('utf8');
 
@@ -73,5 +72,6 @@ while ($row = $res->fetch_array()) {
     . $row[6] . "\"\r\n"); //時間降水量
 }
 
+echo mb_convert_encoding($row, "SJIS", "UTF-8");
 
 $mysqli->close();
