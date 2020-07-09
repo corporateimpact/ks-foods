@@ -56,7 +56,7 @@ def main():
 
     # 新たにアラートが発生、又は復旧した場合はLINE通知する
     if alert_flg == "ON":
-        # LINEへ通知　
+        # LINEへ通知
         send_line_message(line_message)  # <--- この行をコメントアウトすればLINE通知が止まる
         print(line_message)  # LINE通知の代わりにテストでメッセージを確認する為の画面表示
 
@@ -238,6 +238,9 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
 
     # SYSTEMの値を取得するSQL
     sel_sys_sql = "SELECT * FROM m_limit WHERE item = 'SYSTEM';"
+
+    print("現在：" + str(day_time))
+    print("10分前：" + str(before_10min)
 
     # 測定値の時間と、10分前の時間を比較する
     if format(day_time) <= format(before_10min):
