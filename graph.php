@@ -394,9 +394,9 @@ $thr_day_ago = date("Y/m/d", strtotime('-3 day', $daycount));
         <span class="abc" style="background-color:#000000">水槽水温：<?php echo $water_temp_now . "℃"; ?></span>
         <span class="abc" style="background-color:#000000">塩分濃度：<?php echo $salinity_now . "％"; ?></span>
         <span class="abc" style="background-color:#000000">溶存酸素濃度：<?php echo $do_now . ""; ?></span><br><br>
-        <span class="abc" style="background-color:#000000">一時間の雨量：<?php echo $rain_hour_now . "ml"; ?></span>
-        <span class="abc" style="background-color:#000000">現在総雨量：<?php echo $rain_total_now . "ml"; ?></span>
-        <span class="abc" style="background-color:#000000">本日の総雨量：<?php echo $rain_today_now . "ml"; ?></span><br><br>
+        <span class="abc" style="background-color:#000000">時間降水量：<?php echo $rain_hour_now . "ml"; ?></span>
+        <span class="abc" style="background-color:#000000">日降水量：<?php echo $rain_today_now . "ml"; ?></span>
+        <span class="abc" style="background-color:#000000">積算降水量：<?php echo $rain_total_now . "ml"; ?></span><br><br>
         <span class="abc" style="background-color:#000000">歌津水温 最終更新日：<?php echo $uta_date; ?></span>
         <span class="abc" style="background-color:#000000">10時：<?php echo $uta_temp_10 . "℃"; ?></span>
         <span class="abc" style="background-color:#000000">15時：<?php echo $uta_temp_15 . "℃"; ?></span>

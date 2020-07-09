@@ -98,16 +98,6 @@ foreach( $_rawData as $_rawBlock ) {
     $sc_date = date('Y-m-d');
 
 
-    //echo $str. '!!!';
-    //echo $sc_time ."\n";  // 時間
-    //echo $sc_temp . "℃,\n";  // 気温
-    //echo $sc_rain . "ml/h,\n";  // 一時間ごとの降水量
-    //echo $sc_wind . ",\n";  // 未使用
-    //echo $sc_wspd . "m/s,\n";  // 未使用
-    //echo $sc_sun . "lux\n";    // 未使用
-
-
-
      //ＭｙＳＱＬへ接続(DB_HOST, DB_USER, DB_PASS)
      $mysqli = new mysqli ($host_name, $user_name, $db_password, $db_name);
      if ($mysqli->connect_error) {
@@ -117,82 +107,60 @@ foreach( $_rawData as $_rawBlock ) {
          $mysqli->set_charset("utf8");
      }
 
-     // mysql構文1　直前の降水量データを取得
-     $sql = 'select rain_hour from ksfoods.area_info order by day desc, time desc limit 1;';
-     $rain_before_row = $mysqli->query($sql);
-     if (!$rain_before_row) {
-         die('select fault'.mysql_error());
-     }
-     $rain_before_row = $rain_before_row->fetch_array();
-     $rain_before = $rain_before_row[0];
 
-
-     // mysql構文2　最新の総雨量データを取得
+     // mysql構文1　最新の総雨量データを取得
      $sql = 'select rain_total from ksfoods.area_info order by day desc, time desc limit 1;';
      $rain_total_row = $mysqli->query($sql);
      if (!$rain_total_row) {
          die('select fault'.mysql_error());
      }
      $rain_total_row = $rain_total_row->fetch_array();
-     //var_dump($rain_total_row);
-     $rain_total = $rain_total_row[0];
+     $rain_total_before = $rain_total_row[0];
+     echo "直前の総雨量:". $rain_total_before . "\n";                              // 直前の総雨量
 
-     // mysql構文3　当日の降水量データを取得
+     // mysql構文2　当日の降水量データを取得
      $sql = "select sum(rain_hour) from ksfoods.area_info where day=date(now());";
      $rain_todayall_row = $mysqli->query($sql);
      if (!$rain_todayall_row) {
          die('select fault'.mysql_error());
      }
      $rain_todayall_row = $rain_todayall_row->fetch_array();
-     $rain_todayall = $rain_todayall_row[1];
+     $rain_todayall = $rain_todayall_row[0];
+     $rain_todayall = (float)$rain_todayall + (float)$sc_rain;    //最新の雨量を加算
+     echo "当日降水量:". $rain_todayall . "\n";                                  // 当日降水量
 
-     $rain_todayall = (float)$rain_todayall + (float)$sc_rain;    //当日分に最新データを加算
-     $rain_total = (float)$rain_total + (float)$sc_rain;          //総雨量に最新データを加算
-     if ((int)$sc_rain == 0) {                                     //取得した雨量がゼロなら総雨量リセット
-         $rain_total = 0.0;
+
+     // mysql構文3　総雨量確認と計算リセット用(直前4時間分の降雨量データを取得)
+     $sql = 'select sum(rain_hour) from (select rain_hour from ksfoods.area_info order by day desc, time desc limit 4) as subt;';
+     $rain_total_row = $mysqli->query($sql);
+     if (!$rain_total_row) {
+         die('select fault'.mysql_error());
      }
-     //  確認
-     //echo $sc_rain . "\n";           //今回収した1時間ごとの雨量
-     //echo $rain_before . "\n";       //直前の雨量
-     //echo $rain_total . "\n";        //直前の総雨量
-     //echo $rain_todayall . "\n";     //当日総雨量
+     $rain_total_row = $rain_total_row->fetch_array();
+     $rain_total_check = $rain_total_row[0];
+     $rain_total = (float)$rain_total_before + (float)$sc_rain;   //総雨量に最新データを加算
+     if ((float)$rain_total_check == 0.0) {                       //取得した雨量がゼロなら総雨量リセット
+         $rain_total = $sc_rain;
+     }
+     echo "登録される総雨量:". $rain_total. "\n";
 
-     //$mysqli->close();        //DB.close();
+     //24時→0時として登録する
+     if ($sc_time === "24:00:00") {
+         $sc_time = "00:00:00";
+     }
 
      //登録データ確認
      $sc_date = '"' . $sc_date . '"';
      $sc_time = '"' . $sc_time . '"';
-     //echo $sc_date . "\n";
-     //echo $sc_time . "\n";
-     //echo $sc_temp . "\n";
-     //echo $sc_rain . "\n";
-     //echo $rain_todayall . "\n";
-     //echo $rain_total . "\n";
 
-     //mysql構文4　データ登録用
+     //mysql構文4 データ登録用
      $sql = "replace into area_info values ( " . $area_no . ", " . $sc_date . ", " . $sc_time . ", " . (float)$sc_temp . ", " . (float)$sc_rain . ", " . (float)$rain_todayall . ", " . (float)$rain_total . ");";
-     //echo $sql . "\n";
 
      $mysqli_result = $mysqli->query($sql);
      if (!$mysqli_result) {
          die('insert fault'.mysql_error() . "\n");
      }
 
-     //水温テーブルへ既存データの更新（UPDATE）
-     //$sql="update ". $table_name1 . " set ". $air_temp_value. " = ".$str;
-     //$sql=$sql. " where timestamp BETWEEN '".date( "Y/m/d H:", time()+32400 )."00:00"."' and '". date( "Y/m/d H:", time()+32400 )."59:59"."'";
-     // タイムゾーンがずれてるので修正:20200207 伊藤
-     //$sql=$sql. " where timestamp BETWEEN '".date( "Y/m/d H:", time())."00:00"."' and '". date( "Y/m/d H:", time())."59:59"."'";
-
- //echo $sql;
-
-
-
-     //$result_flag = $mysqli->query($sql);
-     //if (!$result_flag) {
-     //die('UPDATE fault'.mysql_error());
-     //}
-     //ＭｙＳＱＬの接続を切る(DB_HOST, DB_USER, DB_PASS)
      $mysqli->close();        //DB.close();
    }
    $now++;
