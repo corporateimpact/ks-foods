@@ -240,7 +240,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
     sel_sys_sql = "SELECT * FROM m_limit WHERE item = 'SYSTEM';"
 
     print("現在：" + str(day_time))
-    print("10分前：" + str(before_10min)
+    print("10分前：" + str(before_10min))
 
     # 測定値の時間と、10分前の時間を比較する
     if format(day_time) <= format(before_10min):
