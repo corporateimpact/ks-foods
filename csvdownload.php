@@ -65,7 +65,7 @@ $bom = "\xEF\xBB\xBF";
 $header_str = "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\",\"志津川気温\",\"時間降水量\"\r\n";
 
 // ヘッダにbomを付与して出力
-echo $bom + $header_str;
+echo $bom . $header_str;
 
 // echo mb_convert_encoding($header_str, "SJIS", "UTF-8");
 // echo "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\",\"志津川気温\",\"時間降水量\"\r\n";
