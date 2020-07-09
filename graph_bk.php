@@ -217,10 +217,12 @@ while ($row2 = $res2->fetch_array()) {
 $sql2 = "select * from ksfoods.area_info order by day desc, time desc limit 1;";
 $res2 = $mysqli->query($sql2);
 $row2 = $res2->fetch_array();
+
+
 $air_temp_now = $row2[3];
 $rain_hour_now = $row2[4];
 $rain_today_now = $row2[5];
-$rain_total_now = $row2[6];
+$rain_total_ow = $row2[6];
 
 
 //みやぎ水産naviからのデータ回収
@@ -231,39 +233,14 @@ $uta_date = $row3[0];
 $uta_temp_10 = $row3[1];
 $uta_temp_15 = $row3[2];
 
-
-//三日間平均値　表示用の日付処理
-$oneday_ago = date('Y-m-d', strtotime('-1 day'));
-$twoday_ago = date('Y-m-d', strtotime('-2 day'));
-$threeday_ago = date('Y-m-d', strtotime('-3 day'));
-
-
-//平均値データの抽出　志津川気温
-$sql4 = "select round(avg(temp), 1) as days from ksfoods.area_info group by day order by day desc, time desc limit 4;";
-$res4 = $mysqli->query($sql4);
-$oldtemp = array();
-
-while ($row4 = $res4->fetch_array() ){
-    $oldtemp[] = $row4[0];
-}
-
-
-//平均値データの抽出 水槽データ
-$sql5 = "select round(avg(water_temp), 1) as water_temp, round(avg(salinity), 1) as salinity, round(avg(do), 1) as do from ksfoods.data group by day order by day desc, time desc limit 4;";
-$res5 = $mysqli->query($sql5);
-$oldwatertemp = array();
-$oldsalinity = array();
-$olddo = array();
-while ($row5 = $res5->fetch_array() ){
-    $oldwatertemp[] = $row5[0];
-    $oldsalinity[] = $row5[1];
-    $olddo[] = $row5[2];
-}
-
-
 //接続終了
 $mysqli->close();
 
+//表示用の日付処理
+$daycount = date("Y/m/d H:i:s");
+$one_day_ago = date("Y/m/d", strtotime('-1 day', $daycount));
+$two_day_ago = date("Y/m/d", strtotime('-2 day', $daycount));
+$thr_day_ago = date("Y/m/d", strtotime('-3 day', $daycount));
 //ここまで処理用
 ?>
 
@@ -397,86 +374,38 @@ $mysqli->close();
     span.abc {
       display: inline-block;
     }
-    table {
-        text-align: center;
-        font-size: 12pt;
-        font-weight: bold;
-    }
     table th{
-        padding : 5px 5px;
+        padding : 10px 10px;
     }
     table td{
-        padding : 5px 5px;
+        padding : 10px 10px;
     }
     th,td{
         border:solid 1px #aaaaaa;
     }
-    table tr:nth-child(2){
-        background:#fff5e5;
-        }
   </style>
 
 
-    <div align="center">
-    <table>
-        <tbody>
-            <tr>
-                <th></th>
-                <th>志津川気温</th>
-                <th>水槽水温</th>
-                <th>塩分濃度</th>
-                <th>溶存酸素濃度</th>
-            </tr>
-            <tr>
-                <td><?php echo $day_now . " " . substr($time, 0, 5) . " 最新"; ?></td>
-                <td><?php echo $air_temp_now . "℃"; ?></td>
-                <td><?php echo $water_temp_now . "℃"; ?></td>
-                <td><?php echo $salinity_now . "％"; ?></td>
-                <td><?php echo $do_now . "mg/L"; ?></td>
-            </tr>
-            <tr>
-                <td><?php echo $oneday_ago . " 日平均" ?></td>
-                <td><?php echo $oldtemp[1] . "℃"; ?></td>
-                <td><?php echo $oldwatertemp[1] . "℃"; ?></td>
-                <td><?php echo $oldsalinity[1] . "％"; ?></td>
-                <td><?php echo $olddo[1] . "mg/L"; ?></td>
-            </tr>
-            <tr>
-                <td><?php echo $twoday_ago . " 日平均" ?></td>
-                <td><?php echo $oldtemp[2] . "℃"; ?></td>
-                <td><?php echo $oldwatertemp[2] . "℃"; ?></td>
-                <td><?php echo $oldsalinity[2] . "％"; ?></td>
-                <td><?php echo $olddo[2] . "mg/L"; ?></td>
-            </tr>
-            <tr>
-                <td><?php echo $threeday_ago . " 日平均" ?></td>
-                <td><?php echo $oldtemp[3] . "℃"; ?></td>
-                <td><?php echo $oldwatertemp[3] . "℃"; ?></td>
-                <td><?php echo $oldsalinity[3] . "％"; ?></td>
-                <td><?php echo $olddo[3] . "mg/L"; ?></td>
-            </tr>
-        </tbody>
-        </table>
-        <table>
-        <tbody>
-            <tr>
-                <th></th>
-                <th>時間降水量</th>
-                <th>日降水量</th>
-                <th>積算降水量</th>
-                <th>歌津水温<br>(10時)</th>
-            </tr>
-            <tr>
-                <td><?php echo $day_now . " " . substr($time, 0, 5) . " 最新"; ?></td>
-                <td><?php echo $rain_hour_now . "ml"; ?></td>
-                <td><?php echo $rain_today_now . "ml"; ?></td>
-                <td><?php echo $rain_total_now . "ml"; ?></td>
-                <td><?php echo $uta_temp_10 . "℃"; ?></td>
-            </tr>
-        </tbody>
-        </table>
-    </div>
-    <br>
+  <strong>
+    <font color="white" size="4">
+      <div align="center">
+        <span class="abc" style="background-color:#000000"><?php echo $day_now . " " . substr($time, 0, 5) . " 時点"; ?></span>
+        <span class="abc" style="background-color:#000000">志津川気温：<?php echo $air_temp_now . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">水槽水温：<?php echo $water_temp_now . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">塩分濃度：<?php echo $salinity_now . "％"; ?></span>
+        <span class="abc" style="background-color:#000000">溶存酸素濃度：<?php echo $do_now . ""; ?></span><br><br>
+        <span class="abc" style="background-color:#000000">時間降水量：<?php echo $rain_hour_now . "ml"; ?></span>
+        <span class="abc" style="background-color:#000000">日降水量：<?php echo $rain_today_now . "ml"; ?></span>
+        <span class="abc" style="background-color:#000000">積算降水量：<?php echo $rain_total_now . "ml"; ?></span><br><br>
+        <span class="abc" style="background-color:#000000">歌津水温 最終更新日：<?php echo $uta_date; ?></span>
+        <span class="abc" style="background-color:#000000">10時：<?php echo $uta_temp_10 . "℃"; ?></span>
+        <span class="abc" style="background-color:#000000">15時：<?php echo $uta_temp_15 . "℃"; ?></span>
+
+      </div>
+
+    </font>
+  </strong>
+
   <canvas id="myChart1"></canvas>
   <canvas id="myChart2"></canvas>
 
@@ -590,7 +519,7 @@ $mysqli->close();
 <script>
   var ctx = document.getElementById("myChart1").getContext("2d");
   ctx.canvas.width = window.innerWidth - 20;
-  ctx.canvas.height = 250;
+  ctx.canvas.height = 320;
   var myChart = new Chart(ctx, {
     type: "bar",
     data: {
@@ -621,7 +550,7 @@ $mysqli->close();
 
   var ctx = document.getElementById("myChart2").getContext("2d");
   ctx.canvas.width = window.innerWidth - 20;
-  ctx.canvas.height = 250;
+  ctx.canvas.height = 320;
   var myChart = new Chart(ctx, {
     type: "bar",
     data: {
