@@ -43,6 +43,10 @@ alert_flg = "OFF"  # LINEアラートが発生したら"ON"
 before_10min = time.time() - 600
 before_10min = datetime.datetime.fromtimestamp(before_10min)
 
+#30分前の時刻を取得
+before_30min = time.time() - 1800
+before_30min = datetime.datetime.fromtimestamp(before_30min)
+
 
 def main():
     """
@@ -241,9 +245,11 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
 
     print("現在：" + str(day_time))
     print("10分前：" + str(before_10min))
+    print("30分前：" + str(before_30min))
 
-    # 測定値の時間と、10分前の時間を比較する
-    if format(day_time) <= format(before_10min):
+
+    # 測定値の時間と、30分前の時間を比較する
+    if format(day_time) <= format(before_30min):
         # 測定値が最新でない場合、測定停止のアラート通知を行う
         alert_cur = common.connect_database_project()
 
