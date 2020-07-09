@@ -59,7 +59,9 @@ $sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, are
 $res = $mysqli->query($sql);
 
 // ヘッダー作成
-echo "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\",\"志津川気温\",\"時間降水量\"\r\n";
+$header_str = "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\",\"志津川気温\",\"時間降水量\"\r\n";
+echo mb_convert_encoding($header_str, "SJIS", "UTF-8");
+// echo "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\",\"志津川気温\",\"時間降水量\"\r\n";
 
 
 while ($row = $res->fetch_array()) {
@@ -72,6 +74,6 @@ while ($row = $res->fetch_array()) {
     . $row[6] . "\"\r\n"); //時間降水量
 }
 
-echo mb_convert_encoding($row, "SJIS", "UTF-8");
+
 
 $mysqli->close();
