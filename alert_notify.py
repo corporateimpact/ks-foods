@@ -146,7 +146,7 @@ def set_mail_message():
     else:
         mail_subject = subject_head
 
-    mail_subject = subject_head + limit_tbl_item
+    mail_subject = subject_head + str(limit_tbl_item)
     # メールの本文を作成する
     mail_body = line_message
 
