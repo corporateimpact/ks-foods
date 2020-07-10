@@ -258,7 +258,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             limit_tbl_flg = row[4]
         if limit_tbl_flg == "OK":
             alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
-            line_message = line_message + "\n計測が停止しています。"
+            line_message = line_message + "\n測定が停止しています。"
             # リミットテーブルの更新
             alert_cur.execute(upd_sys_sql)
         alert_cur.close()
