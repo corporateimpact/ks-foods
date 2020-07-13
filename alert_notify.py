@@ -312,7 +312,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
                     alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
                     line_message = set_line_message(
                         line_message) + "が設定値より低下しました。"
-                    print(str(line_message)
+                    print(str(line_message))
                 else:
                     pass
                 limit_tbl_flg = "NG"  # リミットテーブルのフラグに"NG"を立てる
