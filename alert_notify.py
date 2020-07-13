@@ -266,10 +266,12 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
     else:
         # 測定値が最新の場合、しきい値チェック処理
         check_cur = common.connect_database_project()
+        update_cur = common.pj_con.cursor()
 
         # しきい値を取得するSQL
         sel_check_sql = "SELECT * FROM m_limit WHERE item IN ('water_temp', 'salinity', 'do');"
 
+        # しきい値を取得するSQLの実行
         check_cur.execute(sel_check_sql)
 
         # しきい値テーブルから取得した値を変数に格納
@@ -289,7 +291,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             else:
                 pass
 
-            # しきい値のチェックを行う
+            # しきい値のチェックを行う（３回連続で範囲内のときフラグを"OK"に戻す）
             if (current_value >= limit_tbl_min) and (current_value <= limit_tbl_max):  # 正常の範囲内
                 if limit_tbl_flg == "OK":  # フラグの値が"OK"なら何もしない
                     pass
@@ -324,13 +326,11 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
 
             # リミットテーブルの更新
             upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
-            update_cur = common.connect_database_project()
             update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
-            update_cur.close()
 
-        check_cur = common.connect_database_project()
         # リミットテーブルの更新（測定値、取得再開の判断）
         check_cur.execute("select * from m_limit where item = 'SYSTEM';")
+
         for row in check_cur.fetchall():
             limit_tbl_flg = row[4]
         if limit_tbl_flg == "NG":
@@ -340,8 +340,9 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             # リミットテーブルの更新
             update_cur.execute(
                 "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';")
-            update_cur.close()
 
+        check_cur.close()
+        update_cur.close()
 
 # メイン関数を実行
 if __name__ == "__main__":
