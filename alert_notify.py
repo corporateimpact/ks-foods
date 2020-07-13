@@ -330,7 +330,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             # リミットテーブルの更新
             upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
             update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
-            print("update 実行した" + limit_tbl_flg + limit_tbl_item)
+            print("update 実行した" + upd_limit_sql + limit_tbl_flg + limit_tbl_item)
 
         # リミットテーブルの更新（測定値、取得再開の判断）
         check_cur.execute("select * from m_limit where item = 'SYSTEM';")
