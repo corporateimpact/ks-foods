@@ -304,6 +304,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
                     limit_tbl_flg = "OK"
                     line_message = set_line_message(
                         line_message) + "が範囲内になりました。"
+                    print("範囲内")
                 else:
                     pass
             elif current_value < limit_tbl_min:  # 最低値を下回った場合
@@ -327,6 +328,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             # リミットテーブルの更新
             upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
             update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
+            print("update 実行した")
 
         # リミットテーブルの更新（測定値、取得再開の判断）
         check_cur.execute("select * from m_limit where item = 'SYSTEM';")
@@ -336,10 +338,11 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
         if limit_tbl_flg == "NG":
             alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
             line_message = line_message + "\n計測が再開されました。"
-            update_cur = common.connect_database_project()
+            print("計測再開")
             # リミットテーブルの更新
-            update_cur.execute(
-                "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';")
+            update_sql = "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';"
+            update_cur.execute(update_sql)
+                
 
         check_cur.close()
         update_cur.close()
