@@ -43,7 +43,7 @@ alert_flg = "OFF"  # LINEアラートが発生したら"ON"
 before_10min = time.time() - 600
 before_10min = datetime.datetime.fromtimestamp(before_10min)
 
-#30分前の時刻を取得
+# 30分前の時刻を取得
 before_30min = time.time() - 1800
 before_30min = datetime.datetime.fromtimestamp(before_30min)
 
@@ -174,7 +174,7 @@ def send_mail(to_address, str_subject, str_body):
 
     print("address:" + to_address)
     print("subject:" + str_subject)
-    print("body:"+ str_body)
+    print("body:" + str_body)
 
     # 送信メールの本文を作成する
     mail_message = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s" %
@@ -243,7 +243,6 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
     print("10分前：" + str(before_10min))
     print("30分前：" + str(before_30min))
 
-
     # 測定値の時間と、30分前の時間を比較する
     if format(day_time) <= format(before_30min):
         # 測定値が最新でない場合、測定停止のアラート通知を行う
@@ -261,6 +260,9 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             line_message = line_message + "\n測定が停止しています。"
             # リミットテーブルの更新
             alert_cur.execute(upd_sys_sql)
+
+            # commitしてDBに反映
+            common.pj_con.commit()
         alert_cur.close()
 
     else:
@@ -328,11 +330,8 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
                 limit_tbl_flg = "NG"  # リミットテーブルのフラグに"NG"を立てる
 
             # リミットテーブルの更新
-            # upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
-            # update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
-            # print("update 実行した" + upd_limit_sql + limit_tbl_flg + limit_tbl_item)
-
-            upd_limit_sql = "UPDATE m_limit SET flg_sts = '%s' WHERE item = '%s';" % (limit_tbl_flg, limit_tbl_item)
+            upd_limit_sql = "UPDATE m_limit SET flg_sts = '%s' WHERE item = '%s';" % (
+                limit_tbl_flg, limit_tbl_item)
             update_cur.execute(upd_limit_sql)
 
             # commitしてDBに反映する
@@ -352,11 +351,12 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             # リミットテーブルの更新
             update_sql = "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';"
             update_cur.execute(update_sql)
+            # commitしてDBに反映
             common.pj_con.commit()
-
 
         check_cur.close()
         update_cur.close()
+
 
 # メイン関数を実行
 if __name__ == "__main__":
