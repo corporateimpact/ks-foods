@@ -329,8 +329,11 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
 
             # リミットテーブルの更新
             upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
-            update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
+            update_cur.execute(upd_limit_sql % (limit_tbl_flg, limit_tbl_item))
             print("update 実行した" + upd_limit_sql + limit_tbl_flg + limit_tbl_item)
+
+            upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s" % (limit_tbl_flg, limit_tbl_item)
+            print("変数展開したSQL" + upd_limit_sql)
 
         # リミットテーブルの更新（測定値、取得再開の判断）
         check_cur.execute("select * from m_limit where item = 'SYSTEM';")
@@ -344,7 +347,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             # リミットテーブルの更新
             update_sql = "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';"
             update_cur.execute(update_sql)
-                
+
 
         check_cur.close()
         update_cur.close()
