@@ -328,11 +328,12 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
                 limit_tbl_flg = "NG"  # リミットテーブルのフラグに"NG"を立てる
 
             # リミットテーブルの更新
-            upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
-            update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
+            # upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
+            # update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
             print("update 実行した" + upd_limit_sql + limit_tbl_flg + limit_tbl_item)
 
             upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s" % (limit_tbl_flg, limit_tbl_item)
+            update_cur.execute(upd_limit_sql)
             print("変数展開したSQL" + upd_limit_sql)
 
         # リミットテーブルの更新（測定値、取得再開の判断）
