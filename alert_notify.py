@@ -43,7 +43,7 @@ alert_flg = "OFF"  # LINEアラートが発生したら"ON"
 before_10min = time.time() - 600
 before_10min = datetime.datetime.fromtimestamp(before_10min)
 
-#30分前の時刻を取得
+# 30分前の時刻を取得
 before_30min = time.time() - 1800
 before_30min = datetime.datetime.fromtimestamp(before_30min)
 
@@ -174,7 +174,7 @@ def send_mail(to_address, str_subject, str_body):
 
     print("address:" + to_address)
     print("subject:" + str_subject)
-    print("body:"+ str_body)
+    print("body:" + str_body)
 
     # 送信メールの本文を作成する
     mail_message = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s" %
@@ -243,7 +243,6 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
     print("10分前：" + str(before_10min))
     print("30分前：" + str(before_30min))
 
-
     # 測定値の時間と、30分前の時間を比較する
     if format(day_time) <= format(before_30min):
         # 測定値が最新でない場合、測定停止のアラート通知を行う
@@ -258,18 +257,23 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             limit_tbl_flg = row[4]
         if limit_tbl_flg == "OK":
             alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
-            line_message = line_message + "\n計測が停止しています。"
+            line_message = line_message + "\n測定が停止しています。"
             # リミットテーブルの更新
             alert_cur.execute(upd_sys_sql)
+
+            # commitしてDBに反映
+            common.pj_con.commit()
         alert_cur.close()
 
     else:
         # 測定値が最新の場合、しきい値チェック処理
         check_cur = common.connect_database_project()
+        update_cur = common.pj_con.cursor()
 
         # しきい値を取得するSQL
         sel_check_sql = "SELECT * FROM m_limit WHERE item IN ('water_temp', 'salinity', 'do');"
 
+        # しきい値を取得するSQLの実行
         check_cur.execute(sel_check_sql)
 
         # しきい値テーブルから取得した値を変数に格納
@@ -289,7 +293,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
             else:
                 pass
 
-            # しきい値のチェックを行う
+            # しきい値のチェックを行う（３回連続で範囲内のときフラグを"OK"に戻す）
             if (current_value >= limit_tbl_min) and (current_value <= limit_tbl_max):  # 正常の範囲内
                 if limit_tbl_flg == "OK":  # フラグの値が"OK"なら何もしない
                     pass
@@ -302,6 +306,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
                     limit_tbl_flg = "OK"
                     line_message = set_line_message(
                         line_message) + "が範囲内になりました。"
+                    print("範囲内")
                 else:
                     pass
             elif current_value < limit_tbl_min:  # 最低値を下回った場合
@@ -309,6 +314,7 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
                     alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
                     line_message = set_line_message(
                         line_message) + "が設定値より低下しました。"
+                    print(str(line_message))
                 else:
                     pass
                 limit_tbl_flg = "NG"  # リミットテーブルのフラグに"NG"を立てる
@@ -318,29 +324,38 @@ def check_data(data_day, data_time, data_w_temp, data_salinity, data_do):
                     alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
                     line_message = set_line_message(
                         line_message) + "が設定値を超過しました。"
+                    print(str(line_message))
                 else:
                     pass
                 limit_tbl_flg = "NG"  # リミットテーブルのフラグに"NG"を立てる
 
             # リミットテーブルの更新
-            upd_limit_sql = "UPDATE m_limit SET flg_sts = %s WHERE item = %s"
-            update_cur = common.connect_database_project()
-            update_cur.execute(upd_limit_sql, (limit_tbl_flg, limit_tbl_item))
-            update_cur.close()
+            upd_limit_sql = "UPDATE m_limit SET flg_sts = '%s' WHERE item = '%s';" % (
+                limit_tbl_flg, limit_tbl_item)
+            update_cur.execute(upd_limit_sql)
 
-        check_cur = common.connect_database_project()
+            # commitしてDBに反映する
+            common.pj_con.commit()
+
+            print("変数展開したSQL" + upd_limit_sql)
+
         # リミットテーブルの更新（測定値、取得再開の判断）
         check_cur.execute("select * from m_limit where item = 'SYSTEM';")
+
         for row in check_cur.fetchall():
             limit_tbl_flg = row[4]
         if limit_tbl_flg == "NG":
             alert_flg = "ON"  # アラート通知を"ON"にする（発生のLINE通知）
             line_message = line_message + "\n計測が再開されました。"
-            update_cur = common.connect_database_project()
+            print("計測再開")
             # リミットテーブルの更新
-            update_cur.execute(
-                "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';")
-            update_cur.close()
+            update_sql = "UPDATE m_limit SET flg_sts = 'OK' WHERE item = 'SYSTEM';"
+            update_cur.execute(update_sql)
+            # commitしてDBに反映
+            common.pj_con.commit()
+
+        check_cur.close()
+        update_cur.close()
 
 
 # メイン関数を実行
