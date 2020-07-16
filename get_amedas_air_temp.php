@@ -120,7 +120,7 @@ foreach( $_rawData as $_rawBlock ) {
 
 
     // mysql構文1　最新の積算降水量データを取得(Replese時に追加計算されないように、現在時間は省くようにする)
-    $sql = 'select day, time, rain_total from ksfoods.area_info where time <> "' . $sc_time . '" order by day desc, time desc limit 1;';
+    $sql = 'select day, time, rain_total from ksfoods.area_info where time <> ' . $sc_time . ' order by day desc, time desc limit 1;';
     $rain_total_row = $mysqli->query($sql);
     if (!$rain_total_row) {
         die('select fault'.mysql_error());
@@ -130,7 +130,7 @@ foreach( $_rawData as $_rawBlock ) {
     echo "直前の積算降水量:". $rain_total_before . "\n";         // 直前の積算降水量
 
     // mysql構文2　当日の降水量データを取得(Replese時に追加計算されないように、現在時間は省くようにする)
-    $sql = 'select day, sum(rain_hour) from ksfoods.area_info where day=date(now()) and time <> "' . $sc_time . '";';
+    $sql = 'select day, sum(rain_hour) from ksfoods.area_info where day=date(now()) and time <> ' . $sc_time . ';';
     $rain_todayall_row = $mysqli->query($sql);
     if (!$rain_todayall_row) {
         die('select fault'.mysql_error());
