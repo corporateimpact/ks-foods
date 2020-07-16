@@ -249,7 +249,7 @@ while ($row4 = $res4->fetch_array() ){
 
 
 // 平均値データの抽出 水槽データ
-$sql5 = "select round(avg(water_temp), 1) as water_temp, round(avg(salinity), 1) as salinity, round(avg(do), 1) as do from ksfoods.data group by day order by day desc, time desc limit 4;";
+$sql5 = "select round(avg(water_temp), 1) as water_temp, round(avg(salinity), 2) as salinity, round(avg(do), 1) as do from ksfoods.data group by day order by day desc, time desc limit 4;";
 $res5 = $mysqli->query($sql5);
 $oldwatertemp = array();
 $oldsalinity = array();
