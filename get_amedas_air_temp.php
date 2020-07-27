@@ -88,26 +88,27 @@ foreach( $_rawData as $_rawBlock ) {
     if($null_count==$num_element-1){
         //echo "null!!";
     }
-    $sc_time = $_rawBlock[0];
-    $sc_temp = $_rawBlock[1];
-    $sc_rain = $_rawBlock[2];
-    $sc_wind = $_rawBlock[3];
-    $sc_wspd = $_rawBlock[4];
-    $sc_sun  = $_rawBlock[5];
+    $sc_time = $_rawBlock[0];    //取得時刻
+    $sc_temp = $_rawBlock[1];    //気温
+    $sc_rain = $_rawBlock[2];    //時間降水量
+    $sc_wind = $_rawBlock[3];    //風量
+    $sc_wspd = $_rawBlock[4];    //風速
+    $sc_sun  = $_rawBlock[5];    //日照量
 
 
     //データ成形
     $sc_time = $sc_time . ":00:00";
     $sc_date = date('Y-m-d');
+    echo "\n" . $sc_time . "\n";
 
     $sc_date = '"' . $sc_date . '"';
     $sc_time = '"' . $sc_time . '"';
 
     //24時→0時として登録する
-    if ($sc_time === "24:00:00") {
+    if ($sc_time == "24:00:00") {
         $sc_time = "00:00:00";
     }
-
+    echo "\n" . $sc_time . "\n";
 
     //ＭｙＳＱＬへ接続(DB_HOST, DB_USER, DB_PASS)
     $mysqli = new mysqli ($host_name, $user_name, $db_password, $db_name);
@@ -116,6 +117,13 @@ foreach( $_rawData as $_rawBlock ) {
         exit();
     } else {
         $mysqli->set_charset("utf8");
+    }
+
+    // mysql構文0　24時→0時へ修正(登録時に直してはいるが、まれに残ることがある様子)
+    $sql = 'update area_info set time="00:00:00" where time="24:00:00";';
+    $row_reset = $mysqli->query($sql);
+    if (!$row_reset) {
+        die('select fault'.mysql_error());
     }
 
 
@@ -127,7 +135,7 @@ foreach( $_rawData as $_rawBlock ) {
     }
     $rain_total_row = $rain_total_row->fetch_array();
     $rain_total_before = $rain_total_row[2];
-    echo "直前の積算降水量:". $rain_total_before . "\n";         // 直前の積算降水量
+    echo "\n直前の積算降水量:". $rain_total_before . "\n";         // 直前の積算降水量
 
     // mysql構文2　当日の降水量データを取得(Replese時に追加計算されないように、現在時間は省くようにする)
     $sql = 'select day, sum(rain_hour) from ksfoods.area_info where day=date(now()) and time <> ' . $sc_time . ';';
