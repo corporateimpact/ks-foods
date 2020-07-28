@@ -105,9 +105,7 @@ foreach( $_rawData as $_rawBlock ) {
     $sc_time = '"' . $sc_time . '"';
 
     //24時→0時として登録する
-    if ($sc_time == "24:00:00") {
-        $sc_time = "00:00:00";
-    }
+    $sc_time = str_replace("24", "00", $sc_time);
     echo "\n" . $sc_time . "\n";
 
     //ＭｙＳＱＬへ接続(DB_HOST, DB_USER, DB_PASS)
@@ -119,12 +117,6 @@ foreach( $_rawData as $_rawBlock ) {
         $mysqli->set_charset("utf8");
     }
 
-    // mysql構文0　24時→0時へ修正(登録時に直してはいるが、まれに残ることがある様子)
-    $sql = 'update area_info set time="00:00:00" where time="24:00:00";';
-    $row_reset = $mysqli->query($sql);
-    if (!$row_reset) {
-        die('select fault'.mysql_error());
-    }
 
 
     // mysql構文1　最新の積算降水量データを取得(Replese時に追加計算されないように、現在時間は省くようにする)
@@ -173,6 +165,8 @@ foreach( $_rawData as $_rawBlock ) {
     if (!$mysqli_result) {
         die('insert fault'.mysql_error() . "\n");
     }
+
+
 
     $mysqli->close();        //DB.close();
     }
