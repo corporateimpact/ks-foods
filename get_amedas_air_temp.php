@@ -56,7 +56,11 @@ foreach( $_rawData as $_rawBlock ) {
 
     //now=0:$which=1        //ひとつずれてる
     if($now==($which)){
+<<<<<<< HEAD
         $_rawBlock = explode( "</td>", $_rawBlock );
+=======
+        $_rawBlock = explode( "</td>", $_rawBlock );　                //2つのデータを配列に格納...余計に1つ要素が出る..
+>>>>>>> master
         $str="";
         $null_count=0;
         $num_element=count($_rawBlock)-1;
