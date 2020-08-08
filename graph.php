@@ -162,7 +162,7 @@ while ($row = $res->fetch_array()) {
 }
 
 // MySQLより最新の測定値情報を取得
-$sql = "select * from ksfoods.data order by day desc,time desc limit 1";
+$sql = "select * from ksfoods.data order by day desc, time desc limit 1";
 $res3 = $mysqli->query($sql);
 $row3 = $res3->fetch_array();
 
@@ -177,11 +177,14 @@ $do_now = $row3[6];
 
 
 // AMeDASからのデータ処理
-$sql2 = "select substring(date_format(time,'%H:%i'),1,4) AS JIKAN,round(AVG(temp),2) as temp from ksfoods.area_info where day = '";
+$sql2 = "select substring(date_format(time,'%H:%i'),1,4) AS JIKAN, round(temp, 1) as temp, rain_hour, rain_days, rain_total from ksfoods.area_info where day = '";
 $sql2 = $sql2 . str_replace("/", "-", $org_date);
 $sql2 = $sql2 . "' group by substring(date_format(time,'%H:%i'),1,4) order by JIKAN;";
 $res2 = $mysqli->query($sql2);
-$air_temp = "";     //志津川気温
+$air_temp = "";            // 志津川気温
+$rain_hour_graph = "";     // 時間降水量
+$rain_today_graph = "";    // 日降水量
+$rain_total_graph = "";    // 積算降水量
 
 $i_next = 0;
 $j_next = 0;
@@ -190,7 +193,10 @@ while ($row2 = $res2->fetch_array()) {
     for ($j = $j_next; $j < 6; $j++) {
         if (substr($row2[0], 0, 2) == $i and substr($row2[0], 3, 1) == $j) {
         $air_temp = $air_temp . $row2[1] . ",";
-        if ($j == 3) {
+        $rain_hour_graph = $rain_hour_graph . $row2[2] . ",";
+        $rain_today_graph = $rain_today_graph . $row2[3] . ",";
+        $rain_total_graph = $rain_total_graph . $row2[4] . ",";
+        if ($j == 5) {
             $j_next = 0;
             $i_next = $i + 1;
         } else {
@@ -200,12 +206,18 @@ while ($row2 = $res2->fetch_array()) {
         break 2;
         } elseif (substr($row2[0], 0, 2) > $i) {
         $air_temp = $air_temp . ",";
-        if ($j == 3) {
+        $rain_hour_graph = $rain_hour_graph . ",";
+        $rain_today_graph = $rain_today_graph . ",";
+        $rain_total_graph = $rain_total_graph . ",";
+        if ($j == 5) {
             $j_next = 0;
         }
         } elseif (substr($row2[0], 0, 2) >= $i and substr($row2[0], 3, 1) > $j) {
         $air_temp = $air_temp . ",";
-        if ($j == 3) {
+        $rain_hour_graph = $rain_hour_graph . ",";
+        $rain_today_graph = $rain_today_graph . ",";
+        $rain_total_graph = $rain_total_graph . ",";
+        if ($j == 5) {
             $j_next = 0;
         }
         }
@@ -224,13 +236,12 @@ $rain_total_now = $row2[6];
 
 
 // みやぎ水産naviからのデータ回収
-$sql3 = "select * from ksfoods.miyagi_navi_watertemp order by day desc,day desc limit 1;";
+$sql3 = "select * from ksfoods.miyagi_navi_watertemp order by day desc,day desc limit 4;";
 $res3 = $mysqli->query($sql3);
-$row3 = $res3->fetch_array();
-$uta_date = $row3[0];
-$uta_temp_10 = $row3[1];
-$uta_temp_15 = $row3[2];
-
+$uta_temp_10 = array();
+while ($row3 = $res3->fetch_array() ){
+    $uta_temp_10[] = $row3[1];
+}
 
 // 三日間平均値　表示用の日付処理
 $oneday_ago = date('Y-m-d', strtotime('-1 day'));
@@ -259,6 +270,21 @@ while ($row5 = $res5->fetch_array() ){
     $oldsalinity[] = $row5[1];
     $olddo[] = $row5[2];
 }
+
+
+// 三日間データの作成　降水量各種（最大値）
+$sql6 = "select round(max(rain_hour), 1) as rain_hour, round(max(rain_days), 1) as rain_days, round(max(rain_total), 1) as rain_total from ksfoods.area_info group by day order by day desc, time desc limit 4;";
+$res6 = $mysqli->query($sql6);
+$oldrain_hour = array();
+$oldrain_days = array();
+$oldrain_total = array();
+while ($row6 = $res6->fetch_array() ){
+    $oldrain_hour[] = $row6[0];
+    $oldrain_days[] = $row6[1];
+    $oldrain_total[] = $row6[2];
+}
+
+
 
 
 // 接続終了
@@ -423,6 +449,10 @@ $mysqli->close();
             <tr>
                 <th></th>
                 <th>志津川気温</th>
+                <th>時間降水量</th>
+                <th>日降水量</th>
+                <th>積算降水量</th>
+                <th>歌津水温<br>(10時)</th>
                 <th>水槽水温</th>
                 <th>塩分濃度</th>
                 <th>溶存酸素濃度</th>
@@ -430,6 +460,10 @@ $mysqli->close();
             <tr>
                 <td><?php echo $day_now . " " . substr($time, 0, 5) . " 最新"; ?></td>
                 <td><?php echo $air_temp_now . "℃"; ?></td>
+                <td><?php echo $rain_hour_now . "mm"; ?></td>
+                <td><?php echo $rain_today_now . "mm"; ?></td>
+                <td><?php echo $rain_total_now . "mm"; ?></td>
+                <td><?php echo $uta_temp_10[0] . "℃"; ?></td>
                 <td><?php echo $water_temp_now . "℃"; ?></td>
                 <td><?php echo $salinity_now . "％"; ?></td>
                 <td><?php echo $do_now . "mg/L"; ?></td>
@@ -437,6 +471,10 @@ $mysqli->close();
             <tr>
                 <td><?php echo $oneday_ago . " 日平均" ?></td>
                 <td><?php echo $oldtemp[1] . "℃"; ?></td>
+                <td><?php echo $oldrain_hour[1] . "mm"; ?></td>
+                <td><?php echo $oldrain_days[1] . "mm"; ?></td>
+                <td><?php echo $oldrain_total[1] . "mm"; ?></td>
+                <td><?php echo $uta_temp_10[1] . "℃"; ?></td>
                 <td><?php echo $oldwatertemp[1] . "℃"; ?></td>
                 <td><?php echo $oldsalinity[1] . "％"; ?></td>
                 <td><?php echo $olddo[1] . "mg/L"; ?></td>
@@ -444,6 +482,10 @@ $mysqli->close();
             <tr>
                 <td><?php echo $twoday_ago . " 日平均" ?></td>
                 <td><?php echo $oldtemp[2] . "℃"; ?></td>
+                <td><?php echo $oldrain_hour[2] . "mm"; ?></td>
+                <td><?php echo $oldrain_days[2] . "mm"; ?></td>
+                <td><?php echo $oldrain_total[2] . "mm"; ?></td>
+                <td><?php echo $uta_temp_10[2] . "℃"; ?></td>
                 <td><?php echo $oldwatertemp[2] . "℃"; ?></td>
                 <td><?php echo $oldsalinity[2] . "％"; ?></td>
                 <td><?php echo $olddo[2] . "mg/L"; ?></td>
@@ -451,27 +493,13 @@ $mysqli->close();
             <tr>
                 <td><?php echo $threeday_ago . " 日平均" ?></td>
                 <td><?php echo $oldtemp[3] . "℃"; ?></td>
+                <td><?php echo $oldrain_hour[3] . "mm"; ?></td>
+                <td><?php echo $oldrain_days[3] . "mm"; ?></td>
+                <td><?php echo $oldrain_total[3] . "mm"; ?></td>
+                <td><?php echo $uta_temp_10[3] . "℃"; ?></td>
                 <td><?php echo $oldwatertemp[3] . "℃"; ?></td>
                 <td><?php echo $oldsalinity[3] . "％"; ?></td>
                 <td><?php echo $olddo[3] . "mg/L"; ?></td>
-            </tr>
-        </tbody>
-        </table>
-        <table>
-        <tbody>
-            <tr>
-                <th></th>
-                <th>時間降水量</th>
-                <th>日降水量</th>
-                <th>積算降水量</th>
-                <th>歌津水温<br>(10時)</th>
-            </tr>
-            <tr>
-                <td><?php echo $day_now . " " . substr($time, 0, 5) . " 最新"; ?></td>
-                <td><?php echo $rain_hour_now . "mm"; ?></td>
-                <td><?php echo $rain_today_now . "mm"; ?></td>
-                <td><?php echo $rain_total_now . "mm"; ?></td>
-                <td><?php echo $uta_temp_10 . "℃"; ?></td>
             </tr>
         </tbody>
         </table>
@@ -479,7 +507,7 @@ $mysqli->close();
     <br>
     <canvas id="myChart1"></canvas>
     <canvas id="myChart2"></canvas>
-
+    <canvas id="myChart3"></canvas>
 
 </body>
 
@@ -565,14 +593,14 @@ $mysqli->close();
             max: 5,
             min: 0,
             stepSize: 1
-        },
+        }
         }, {
         id: "y-axis-2",
         type: "linear",
         position: "right",
         scaleLabel: {
             display: true,
-            labelString: "溶存酸素濃度"
+            labelString: "溶存酸素濃度（mg/L）"
         },
         ticks: {
             max: 15.0,
@@ -585,6 +613,59 @@ $mysqli->close();
         }],
     }
     };
+    var complexChartOption3 = {    //降水量グラフの設定
+    responsive: false,
+    maintainAspectRatio: false,
+    scales: {
+        xAxes: [ // Ｘ軸設定
+        {
+            display: true,
+            barPercentage: 1.8,
+            //categoryPercentage: 1.8,
+            gridLines: {
+            display: false
+            },
+        }
+        ],
+        yAxes: [
+            {
+            id: "y-axis-1",
+            type: "linear",
+            position: "left",
+            scaleLabel: {
+                display: true,
+                labelString: "時間降水量（mm）"
+            },
+            ticks: {
+                max: 20,
+                min: 0,
+                stepSize: 2
+            },
+            gridLines: {
+            drawOnChartArea: true,
+            }
+
+            }, {
+            id: "y-axis-2",
+            type: "linear",
+            position: "right",
+            scaleLabel: {
+                display: true,
+                labelString: "日降水量・積算降水量（mm）"
+            },
+        ticks: {
+            max: 40,
+            min: 0,
+            stepSize: 4
+        },
+        gridLines: {
+            drawOnChartArea: false,
+        }
+        }],
+    }
+    };
+
+
 </script>
 
 <script>
@@ -597,7 +678,7 @@ $mysqli->close();
         labels: [<?php echo $label; ?>],
         datasets: [{
             type: "line",
-            label: "水温(℃)",
+            label: "水温（℃）",
             data: [<?php echo $water_temp; ?>],
             borderColor: "rgba(0, 255, 255,0.4)",
             backgroundColor: "rgba(0, 255, 255,0.4)",
@@ -606,7 +687,7 @@ $mysqli->close();
         },
         {
             type: "line",
-            label: "志津川気温(℃)",
+            label: "志津川気温（℃）",
             data: [<?php echo $air_temp; ?>],
             borderColor: "rgba(255,150,0,0.4)",
             backgroundColor: "rgba(255,150,0,0.4)",
@@ -628,7 +709,7 @@ $mysqli->close();
         labels: [<?php echo $label; ?>],
         datasets: [{
             type: "line",
-            label: "塩分濃度(%)",
+            label: "塩分濃度（%）",
             data: [<?php echo $salinity; ?>],
             borderColor: "rgba(0, 255, 0,0.4)",
             backgroundColor: "rgba(0, 255, 0,0.4)",
@@ -637,7 +718,7 @@ $mysqli->close();
         },
         {
             type: "bar",
-            label: "溶存酸素濃度",
+            label: "溶存酸素濃度（mg/L）",
             data: [<?php echo $do; ?>],
             borderColor: "rgba(128,128,0,0.4)",
             backgroundColor: "rgba(128,128,0,0.4)",
@@ -648,4 +729,49 @@ $mysqli->close();
     },
     options: complexChartOption2
     });
+
+    var ctx = document.getElementById("myChart3").getContext("2d");
+    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.height = 250;
+    var myChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+        labels: [<?php echo $label; ?>],
+        datasets: [{
+            type: "bar",
+            label: "時間降水量",
+            lineTension: 0,
+            data: [<?php echo $rain_hour_graph; ?>],
+            borderColor: "rgba(38,0,255,0.9)",
+            backgroundColor: "rgba(38,0,255,0.9)",
+            fill: false, // 中の色を抜く
+            spanGaps: true,
+            yAxisID: "y-axis-1",
+        },
+        {
+            type: "line",
+            label: "日降水量",
+            lineTension: 0,
+            data: [<?php echo $rain_today_graph; ?>],
+            borderColor: "rgba(38,0,255,0.5)",
+            backgroundColor: "rgba(38,0,255,0.2)",
+            //fill: false, // 中の色を抜く
+            spanGaps: true,
+            yAxisID: "y-axis-2",
+        },
+        {
+            type: "line",
+            label: "積算降水量",
+            lineTension: 0,
+            data: [<?php echo $rain_total_graph; ?>],
+            borderColor: "rgba(247,153,243,0.8)",
+            backgroundColor: "rgba(247,153,243,0.8)",
+            //fill: false, // 中の色を抜く
+            spanGaps: true,
+            yAxisID: "y-axis-2",
+        }]
+    },
+    options: complexChartOption3
+    });
+
 </script>
