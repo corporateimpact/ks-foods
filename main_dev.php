@@ -11,9 +11,8 @@ $timeStr = date("Hi00");
 if (isset($_REQUEST['date'])) {
   $dateStr = str_replace("/", "", $_REQUEST['date']);
   $org_date = $_REQUEST['date'];
-  if (isset($_REQUEST['time'])) {
-    $timeStr = str_replace(":", "", $_REQUEST['time']);
-    $times = $_REQUEST['time'];
+  if (isset($times)) {
+    $timeStr = str_replace(":", "", $times);
   } else {
     $timeStr = date("Hi00");
   }
