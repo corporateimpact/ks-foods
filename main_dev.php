@@ -11,7 +11,7 @@ $timeStr = date("Hi00");
 if (isset($_REQUEST['date'])) {
   $dateStr = str_replace("/", "", $_REQUEST['date']);
   $org_date = $_REQUEST['date'];
-  $timeStr = "000000";
+  $timeStr = date("Hi00");
 }
 if (isset($_REQUEST['time'])) {
   $timeStr = str_replace(":", "", $_REQUEST['time']);
@@ -19,27 +19,21 @@ if (isset($_REQUEST['time'])) {
 }
 if (isset($_REQUEST['start_date'])) {
   $start_date = str_replace("/", "", $_REQUEST['start_date']);
-  //   echo $start_date;
 }
 if (isset($_REQUEST['end_date'])) {
   $end_date = str_replace("/", "", $_REQUEST['end_date']);
-  //   echo $end_date;
 }
 if (isset($_REQUEST['start_time'])) {
   $start_time = str_replace("/", "", $_REQUEST['start_time']);
-  //   echo $start_time;
 }
 if (isset($_REQUEST['end_time'])) {
   $end_time = str_replace("/", "", $_REQUEST['end_time']);
-  //   echo $end_time;
 }
 if (isset($_REQUEST['disp_speed'])) {
   $disp_speed = $_REQUEST['disp_speed'];
-  //   echo $disp_speed;
 }
 if (isset($_REQUEST['camera'])) {
   $camera_id = $_REQUEST['camera'];
-  //   echo $camera_id;
 }
 /*********************************/
 
@@ -144,7 +138,7 @@ if ($result = $mysqli->query($selStr)) {
     } else {
       //カメラのIDをプルダウンに格納
       $camera_data .= "<option value='" . $row['id'];
-      $camera_data .= "' selected>カメラ:" . $row['id'] . $camera_type . "</option>";
+      $camera_data .= "'>カメラ:" . $row['id'] . $camera_type . "</option>";
     }
   }
 }
@@ -172,10 +166,10 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
   <!-- 画面のリフレッシュ時間を設定：5分 -->
   <meta http-equiv="Refresh" content="300" name="refTime">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>開発用テスト画面_撮影画像</title>
-  <!-- <meta name="viewport" content="width=device-width"> -->
+  <title>撮影画像</title>
+  <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="css/jquery-ui.min.css" />
-  <link rel="stylesheet" href="css/main_dev.css" />
+  <link rel="stylesheet" href="css/main.css" />
   <link href="css/lightbox.css" rel="stylesheet" />
   <!-- BootstrapのCSS読み込み -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -183,7 +177,6 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
   <script src="js/chart.js"></script>
   <script src="js/jquery.ui.core.min.js"></script>
   <script src="js/jquery.ui.datepicker.min.js"></script>
-  <script src="js/jquery.ui.datepicker-ja.min.js"></script>
   <!-- BootstrapのJS読み込み -->
   <script src="js/bootstrap.min.js"></script>
 
@@ -278,7 +271,6 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
       aForm.action = "graph.php";
       aForm.submit();
     }
-
     /**
      * 養殖日誌画面に遷移する処理
      */
@@ -369,6 +361,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
             end_time: e_time,
             disp_speed: d_speed,
             camera: '<?php echo $camera_id ?>'
+
           }
         })
         //通信成功時
@@ -510,8 +503,8 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
           </td>
         </tr>
         <tr>
-          <th>開始時間</th>
-          <th>終了時間</th>
+          <th>開始時刻</th>
+          <th>終了時刻</th>
           <th>結合開始</th>
         </tr>
         <tr>
