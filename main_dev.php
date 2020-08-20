@@ -462,6 +462,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
             <?php
             echo $camera_data; ?>
           </select>
+          <input type="hidden" name="time" value="<?php echo $timeStr ?>">
           <input type='submit' value='送信' />
         </td>
       </table>
