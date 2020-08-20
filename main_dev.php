@@ -6,6 +6,7 @@ date_default_timezone_set('Asia/Tokyo');
 $org_date = date("Ymd");
 $dateStr = date("Ymd");
 $timeStr = date("Hi00");
+$d_min = "";
 
 /*********************************/
 if (isset($_REQUEST['date'])) {
@@ -596,6 +597,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
     <table class="table table-bordered table-responsive">
       <tr>
         <?php
+        global $d_min;
         $hh = substr($timeStr, 0, 2);
         $m0 = substr($timeStr, 2, 1);
         $min = substr($timeStr, 2, 2);
