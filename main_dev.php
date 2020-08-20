@@ -19,6 +19,7 @@ if (isset($_REQUEST['date'])) {
   // } else {
   //   $timeStr = date("Hi00");
   // }
+  $hh = substr($timeStr, 0, 2);
   $timeStr = $hh . $d_min . "00";
 }
 if (isset($_REQUEST['time'])) {
