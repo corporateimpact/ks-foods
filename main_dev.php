@@ -192,7 +192,6 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
   <script>
     // サムネイル表示関数
     function viewImage($timeStr) {
-      <?php $timeStr = "<script> $timeStr </script>"; ?>
       $times = $timeStr.toString();
       document.getElementById("mainImg").src = "<?php echo "images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_"; ?>" + $times + ".jpg";
       document.getElementById("mainImg_large").href = "<?php echo "images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_"; ?>" + $times + ".jpg";
