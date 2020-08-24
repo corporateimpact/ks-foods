@@ -473,10 +473,6 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
     <hr>
 
     <?php echo substr($dateStr, 0, 4); ?>/<?php echo substr($dateStr, 4, 2); ?>/<?php echo substr($dateStr, 6, 2); ?>
-
-    <br>
-  </div>
-  <div>
     <form method='POST' action='main_dev.php'>
       <table>
         <td>
@@ -485,12 +481,9 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
         </td>
       </table>
     </form>
-    <hr>
-
-    <?php echo substr($dateStr, 0, 4); ?>/<?php echo substr($dateStr, 4, 2); ?>/<?php echo substr($dateStr, 6, 2); ?>
-
     <br>
   </div>
+
   <div class="container">
     <div class="row">
       <div class="col-md-10 offset-md-1">
