@@ -470,7 +470,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
         </td>
       </table>
     </form>
-
+    </br>
     <form method='POST' action='main_dev.php'>
       <table>
         <td>
