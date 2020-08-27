@@ -192,7 +192,6 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
   <script>
     // サムネイル表示関数
     function viewImage($timeStr) {
-      <?php $timeStr = "<script> $timeStr </script>"; ?>
       $times = $timeStr.toString();
       document.getElementById("mainImg").src = "<?php echo "images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_"; ?>" + $times + ".jpg";
       document.getElementById("mainImg_large").href = "<?php echo "images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_"; ?>" + $times + ".jpg";
@@ -471,12 +470,23 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
         </td>
       </table>
     </form>
+    </br>
+    <form method='POST' action='main_dev.php'>
+      <table>
+        <td>
+          <input type="hidden" name="time" value="<?php echo $timeStr = date("Hi00"); ?>">
+          <input type='submit' value='現在時刻' />
+        </td>
+      </table>
+    </form>
+
     <hr>
 
     <?php echo substr($dateStr, 0, 4); ?>/<?php echo substr($dateStr, 4, 2); ?>/<?php echo substr($dateStr, 6, 2); ?>
 
     <br>
   </div>
+
   <div class="container">
     <div class="row">
       <div class="col-md-10 offset-md-1">
