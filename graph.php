@@ -557,7 +557,7 @@ $mysqli->close();
                 labelString: "水温"
             },
             ticks: {
-                max: 25.0,
+                max: 30.0,
                 min: 5.0,
                 stepSize: 5.0
             },
