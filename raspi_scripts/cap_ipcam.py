@@ -9,9 +9,11 @@ import sys
 import os
 import subprocess
 import cv2
+import cv2 as cv
 import configparser
 import err  # 共通エラー処理モジュール
 import set_info  # 共通情報取得モジュール
+import datetime
 
 # 変数宣言
 
@@ -23,7 +25,8 @@ image_info = None
 image_upload_files = None
 image_mini_files = None
 ssh_connect = None
-
+e_check = None
+logtime = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:00]')
 
 def upload_files():
     """
@@ -37,22 +40,35 @@ def upload_files():
 
     i = 0  # 念のためリセット
     for i in range(int(camera_list)):
+        dt_now = datetime.datetime.now()
         i += 1
         make_dir_call = 'sudo ssh ' + \
             ssh_connect[2] + '@' + ssh_connect[0] + ' mkdir -p ' + \
             dir_info[2] + str(i) + '/' + daytime[0] + '/'
-        # print(make_dir_call)
         subprocess.call(make_dir_call.split())
+        # print(make_dir_call)
         upload_call = 'sudo scp -C ' + dir_info[1] + 'images/' + str(i) + '/' + daytime[0] + '/' + daytime[0] + '_' + \
-            daytime[1] + '00.jpg ' + ssh_connect[2] + '@' + ssh_connect[0] + \
-            ':' + dir_info[2] + str(i) + '/' + daytime[0] + '/'
+                      daytime[1] + '00.jpg ' + ssh_connect[2] + '@' + ssh_connect[0] + \
+                      ':' + dir_info[2] + str(i) + '/' + daytime[0] + '/'
+        try:
+            subprocess.check_call(upload_call.split())
+        except subprocess.CalledProcessError as e:
+            print("[" + dt_now.strftime('%Y-%m-%d %H:%M:%S') + "]" + str(e))
+        else:
+            pass
         # print(upload_call)
-        subprocess.call(upload_call.split())
         upload_call = 'sudo scp -C ' + dir_info[1] + 'images/' + str(i) + '/' + daytime[0] + '/' + daytime[0] + '_' + daytime[1] + \
             '00_mini.jpg ' + ssh_connect[2] + '@' + ssh_connect[0] + \
             ':' + dir_info[2] + str(i) + '/' + daytime[0] + '/'
+        try:
+            subprocess.check_call(upload_call.split())
+        except subprocess.CalledProcessError as e:
+            print("[" + dt_now.strftime('%Y-%m-%d %H:%M:%S') + "]" + str(e))
+        else:
+            pass
+
+
         # print(upload_call)
-        subprocess.call(upload_call.split())
 
 
 def set_infomation():
@@ -95,6 +111,8 @@ def image_cap():
     global image_info
     global image_upload_files
     global image_mini_files
+    global e_check
+    global logtime
 
     # 静止画の撮影用
     i = 0
@@ -119,6 +137,7 @@ def image_cap():
         # 書込設定
         image_org_files = str(
             image_dir) + '/' + daytime[0] + '_' + daytime[1] + '00_org.jpg'  # ローカル保存用
+        image_timestamp_files = image_org_files
         image_upload_files = str(
             image_dir) + '/' + daytime[0] + '_' + daytime[1] + '00.jpg'  # アップロード用
         image_mini_files = str(
@@ -126,6 +145,7 @@ def image_cap():
         # print(image_org_files)
         # print(image_upload_files)
         # print(image_mini_files)
+        dt_now = datetime.datetime.now()
         # 撮影開始
         cap = cv2.VideoCapture(ipcamera_list[i])
         # print(ipcamera_list[i])
@@ -142,38 +162,56 @@ def image_cap():
                 break
             else:
                 c += 1
-                # print(c)
+                print("[" + dt_now.strftime('%Y-%m-%d %H:%M:%S') + "] Capture NG.")
         # 終了
         cap.release()
         # 4回以上の場合はエラー判定
         if c >= 4:
-            err.main()
-            # エラー処理された場合はそのまま終了させる
-            sys.exit()
+            print("[" + dt_now.strftime('%Y-%m-%d %H:%M:%S') + "] Camera " + str(camera_no) + " Connection Error.")
+
+        # 20200825処理追加　画像にタイムスタンプを付与する
+        timestamp_img = cv.imread(image_org_files)
+        timetext = dt_now.strftime('%Y-%m-%d %a %H:%M:00')
+        cv.putText(timestamp_img, timetext, (50, 100), cv.FONT_HERSHEY_PLAIN, 4, (255, 255, 255), 10, cv.LINE_AA)  # 白文字太め
+        cv.putText(timestamp_img, timetext, (50, 100), cv.FONT_HERSHEY_PLAIN, 4, (0, 0, 0), 3, cv.LINE_AA)  # 黒文字細め
+        cv.imwrite(image_timestamp_files, timestamp_img)
+        # 20200825追加ここまで
         # アップロード用の画像作成　サイズはそれぞれ固定なので値そのまま書き込み
         # オリジナルファイル読み込み
         load_image = cv2.imread(image_org_files)
         cv2.imwrite(image_upload_files, load_image, [
                     int(cv2.IMWRITE_JPEG_QUALITY), int(upload_imageinfo[2])])  # アップ用
-        up_mini = cv2.resize(load_image, mini_w_h)
-        if load_image is None:
-            err.main()
-            # エラー処理された場合はそのまま終了させる
-            sys.exit()
-        cv2.imwrite(image_mini_files, up_mini, [
-                    int(cv2.IMWRITE_JPEG_QUALITY), int(mini_imageinfo[2])])  # サムネイル
-        # カウントを増やして次へ
-        camera_no = int(camera_no) + 1
+        try:
+            up_mini = cv2.resize(load_image, mini_w_h)
+            cv2.imwrite(image_mini_files, up_mini, [
+                int(cv2.IMWRITE_JPEG_QUALITY), int(mini_imageinfo[2])])  # サムネイル
+        except:
+            # 読み込み失敗の場合はエラーカウント増加
+            print("[" + dt_now.strftime('%Y-%m-%d %H:%M:%S') + "] Image " + str(camera_no) + " Import Error.")
+            e_check =+ 1
+        finally:
+            camera_no = int(camera_no) + 1
+
+
+def error_check():
+    """
+    エラー判定する関数
+    （カメラへのアクセスが全NGだった場合はエラーカウントを追加する
+    """
+    global e_check
+    global camera_list
+    if e_check == int(camera_list):
+        err.main()
 
 
 def main():
     """
     メイン関数
     """
-
     set_infomation()
     image_cap()
     upload_files()
+    error_check()
 
 
 # main関数を呼び出す
