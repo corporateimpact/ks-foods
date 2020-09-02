@@ -20,7 +20,7 @@ if (isset($_REQUEST['date'])) {
   //   $timeStr = date("Hi00");
   // }
   $selhour = substr($timeStr, 0, 2);
-  $selTime = $hh . $d_min . "00";
+  $selTime = $selhour . $d_min . "00";
 }
 if (isset($_REQUEST['time'])) {
   $timeStr = str_replace(":", "", $_REQUEST['time']);
