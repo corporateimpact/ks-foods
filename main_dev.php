@@ -474,7 +474,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
     <form method='POST' action='main_dev.php'>
       <table>
         <td>
-          <input type="hidden" name="time" value="<?php echo $timeStr = date("Hi00"); ?>">
+          <input type="hidden" name="time" value="<?php echo $now = date("Hi00"); ?>">
           <input type='submit' value='現在時刻' />
         </td>
       </table>
