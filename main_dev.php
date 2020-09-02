@@ -19,8 +19,8 @@ if (isset($_REQUEST['date'])) {
   // } else {
   //   $timeStr = date("Hi00");
   // }
-  $hh = substr($timeStr, 0, 2);
-  $timeStr = $hh . $d_min . "00";
+  $selhour = substr($timeStr, 0, 2);
+  $selTime = $hh . $d_min . "00";
 }
 if (isset($_REQUEST['time'])) {
   $timeStr = str_replace(":", "", $_REQUEST['time']);
@@ -465,7 +465,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
             <?php
             echo $camera_data; ?>
           </select>
-          <input type="hidden" name="time" value="<?php echo $timeStr ?>">
+          <input type="hidden" name="time" value="<?php echo $selTime ?>">
           <input type='submit' value='送信' />
         </td>
       </table>
