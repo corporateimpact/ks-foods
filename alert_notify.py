@@ -181,7 +181,7 @@ def send_mail(to_address, str_subject, str_body):
                     (smtp_addr, to_address, str_subject, str_body))
 
     # メール送信処理
-    smtp.sendmail(smtp_addr.encode('utf-8'), to_address.encode('utf-8'), mail_message.encode('utf-8'))
+    smtp.sendmail(smtp_addr, to_address, mail_message.encode('utf-8'))
 
     print(mail_message)
 
