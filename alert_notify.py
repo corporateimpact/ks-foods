@@ -178,7 +178,7 @@ def send_mail(to_address, str_subject, str_body):
 
     # 送信メールの本文を作成する
     mail_message = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s" %
-                    (to_address, to_address, str_subject, str_body))
+                    (smtp_addr, to_address, str_subject, str_body))
 
     # メール送信処理
     smtp.sendmail(smtp_addr, to_address, mail_message.encode('utf-8'))
