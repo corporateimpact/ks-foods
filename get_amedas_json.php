@@ -24,17 +24,17 @@ $set_sql_time = '"'. $which. ':00:00"';
 // 参照するjsonファイル番号を設定(毎日3時間ごとに番号を振られて作成される)
 if(0 <= $which && $which <= 3) {
     $json_no = "00";
-} elseif (3 <= $which && $which <= 3) {
+} elseif (3 <= $which && $which < 3) {
     $json_no = "03";
-} elseif (6 <= $which && $which <= 6) {
+} elseif (6 <= $which && $which < 6) {
     $json_no = "06";
-} elseif (9 <= $which && $which <= 12) {
+} elseif (9 <= $which && $which < 12) {
     $json_no = "09";
-} elseif (12 <= $which && $which <= 15) {
+} elseif (12 <= $which && $which < 15) {
     $json_no = "12";
-} elseif (15 <= $which && $which <= 18) {
+} elseif (15 <= $which && $which < 18) {
     $json_no = "15";
-} elseif (18 <= $which && $which <= 21) {
+} elseif (18 <= $which && $which < 21) {
     $json_no = "18";
 } elseif (21 <= $which) {
     $json_no = "21";
