@@ -26,7 +26,7 @@ if(0 <= $which && $which <= 3) {
     $json_no = "00";
 } elseif (3 <= $which && $which < 3) {
     $json_no = "03";
-} elseif (6 <= $which && $which < 6) {
+} elseif (6 <= $which && $which < 9) {
     $json_no = "06";
 } elseif (9 <= $which && $which < 12) {
     $json_no = "09";
@@ -46,7 +46,7 @@ if(0 <= $which && $which <= 3) {
 $url = "https://www.jma.go.jp/bosai/amedas/data/point/". $area_no. "/". $set_json_date. "_". $json_no. ".json";
 $json_get = file_get_contents($url);
 $json_data = json_decode($json_get, TRUE);
-$set = $json_data[$set_json_date. $which. "0000"];
+$set = $json_data[$set_json_date. $what. "0000"];
 $temp = $set["temp"];
 $rain_hour = $set["precipitation1h"];
 echo $set_sql_date. "\n";
