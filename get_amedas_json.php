@@ -22,7 +22,7 @@ $set_sql_date = '"'. date("Y-m-d"). '"';
 $set_sql_time = '"'. $which. ':00:00"';
 
 // 参照するjsonファイル番号を設定(毎日3時間ごとに番号を振られて作成される)
-if(0 <= $which && $which <= 3) {
+if(0 <= $which && $which < 3) {
     $json_no = "00";
 } elseif (3 <= $which && $which < 6) {
     $json_no = "03";
