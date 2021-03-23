@@ -3,12 +3,16 @@
 """
 ----- ケーエスフーズIoT測定値異常時のLINE・メール通知 -----
 """
+from email.mime.text import MIMEText
+from email.utils import formatdate
+
 import time
 import datetime
 import smtplib
 import requests
 import mysql.connector
 from common_module import common
+
 
 # 上限値項目のカラムと物理名を紐付けるdictonayを作成
 item_dict = {
@@ -177,11 +181,17 @@ def send_mail(to_address, str_subject, str_body):
     print("body:" + str_body)
 
     # 送信メールの本文を作成する
-    mail_message = ("From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n%s" %
-                    (smtp_addr, to_address, str_subject, str_body))
+    mail_message = MIMEText(str_body)
+    mail_message["Subject"] = str_subject
+    mail_message["From"] = smtp_addr
+    mail_message["To"] = to_address
+    mail_message["Date"] = formatdate()
 
     # メール送信処理
-    smtp.sendmail(smtp_addr, to_address, mail_message.encode('utf-8'))
+    smtp.sendmail(smtp_addr, to_address, mail_message.as_string())
+
+    # close処理
+    smtp.close()
 
     print(mail_message)
 
