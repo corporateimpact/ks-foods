@@ -139,7 +139,6 @@ def init_smtp():
     # 後処理としてクローズ処理を実行する
     common.close_con_connect(common.pj_con, smtp_cur)
 
-
 def set_mail_message():
     """
     送信するメールメッセージの設定を行う処理
@@ -170,6 +169,8 @@ def set_mail_message():
         # 送信対象のメールアドレスにメールを送信する
         send_mail(mail_address, mail_subject, mail_body)
 
+    #対象者分メール送信が終了したら、クローズ処理
+    smtp.close()
 
 def send_mail(to_address, str_subject, str_body):
     """
@@ -189,9 +190,6 @@ def send_mail(to_address, str_subject, str_body):
 
     # メール送信処理
     smtp.sendmail(smtp_addr, to_address, mail_message.as_string())
-
-    # close処理
-    smtp.close()
 
     print(mail_message)
 
