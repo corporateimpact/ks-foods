@@ -284,7 +284,49 @@ while ($row6 = $res6->fetch_array() ){
     $oldrain_total[] = $row6[2];
 }
 
-
+// グラフの表示領域算出用　
+//準備
+$maxtemp_default = array(25, 30, 35, 40, 45);
+$mintemp_default = array(0, -10);
+echo "\n";
+$air_temp_array = (float)max(explode(",", $air_temp));
+var_dump($air_temp_array);
+echo "\n";
+echo min($air_temp);
+//$rain_graph_area_a_list = [20, 40, 60, 100, 120, 160]
+//$rain_graph_area_b_list = [40, 80, 120, 160, 200, 240, 280]
+//気温最大値　基準は25℃
+if ($maxtemp_default[3] < $air_temp_array ){
+    $temp_graph_area_max = $maxtemp_default[4];
+    echo "5";
+} elseif ($maxtemp_default[2] < $air_temp_array && $air_temp_array <= $maxtemp_default[3]){
+    $temp_graph_area_max = $maxtemp_default[3];
+    echo "4";
+} elseif ($maxtemp_default[1] < $air_temp_array && $air_temp_array <= $maxtemp_default[2]){
+    $temp_graph_area_max = $maxtemp_default[2];
+    echo "3";
+} elseif ($maxtemp_default[0] < $air_temp_array && $air_temp_array <= $maxtemp_default[1]){
+    $temp_graph_area_max = $maxtemp_default[1];
+    echo "2";
+} elseif ($air_temp_array < $maxtemp_default[0]){
+    $temp_graph_area_max = $maxtemp_default[0];
+    echo "1";
+}
+echo "\n";
+var_dump(array_diff(explode(",", $air_temp), null));
+//気温最小値　基準は0℃
+//負の数同士の比較ができないので、段階を分けてチェックする
+echo "\n";
+$air_temp_array = (float)min(explode(",", $air_temp));
+echo $air_temp_array;
+if ($mintemp_default[0] > min((float)explode(",", $air_temp)) or $mintemp_default[0] > max((float)explode(",", $air_temp))){
+    $temp_graph_area_min = $mintemp_default[1];
+} else {
+    $temp_graph_area_min = $mintemp_default[0];
+}
+echo "\n";
+echo $temp_graph_area_min;
+//
 
 
 // 接続終了
@@ -541,9 +583,9 @@ $mysqli->close();
                 labelString: "気温（℃）"
             },
             ticks: {
-                max: 35,
-                min: 0,
-                stepSize: 5
+                max: 40,
+                min: -10,
+                stepSize: 10
             },
             gridLines: {
             drawOnChartArea: true,
@@ -557,9 +599,9 @@ $mysqli->close();
                 labelString: "水温"
             },
             ticks: {
-                max: 30.0,
-                min: 5.0,
-                stepSize: 5.0
+                max: 40.0,
+                min: -10.0,
+                stepSize: 10.0
             },
             gridLines: {
                 drawOnChartArea: false,
