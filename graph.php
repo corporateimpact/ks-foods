@@ -290,42 +290,42 @@ $maxtemp_default = array(25, 30, 35, 40, 45);
 $mintemp_default = array(0, -10);
 echo "\n";
 $air_temp_array = (float)max(explode(",", $air_temp));
-var_dump($air_temp_array);
+//var_dump($air_temp_array);
 echo "\n";
-echo min($air_temp);
+//echo min($air_temp);
 //$rain_graph_area_a_list = [20, 40, 60, 100, 120, 160]
 //$rain_graph_area_b_list = [40, 80, 120, 160, 200, 240, 280]
 //気温最大値　基準は25℃
 if ($maxtemp_default[3] < $air_temp_array ){
     $temp_graph_area_max = $maxtemp_default[4];
-    echo "5";
+    //echo "5";
 } elseif ($maxtemp_default[2] < $air_temp_array && $air_temp_array <= $maxtemp_default[3]){
     $temp_graph_area_max = $maxtemp_default[3];
-    echo "4";
+    //echo "4";
 } elseif ($maxtemp_default[1] < $air_temp_array && $air_temp_array <= $maxtemp_default[2]){
     $temp_graph_area_max = $maxtemp_default[2];
-    echo "3";
+    //echo "3";
 } elseif ($maxtemp_default[0] < $air_temp_array && $air_temp_array <= $maxtemp_default[1]){
     $temp_graph_area_max = $maxtemp_default[1];
-    echo "2";
+    //echo "2";
 } elseif ($air_temp_array < $maxtemp_default[0]){
     $temp_graph_area_max = $maxtemp_default[0];
-    echo "1";
+    //echo "1";
 }
 echo "\n";
-var_dump(array_diff(explode(",", $air_temp), null));
+//var_dump(array_diff(explode(",", $air_temp), null));
 //気温最小値　基準は0℃
 //負の数同士の比較ができないので、段階を分けてチェックする
 echo "\n";
 $air_temp_array = (float)min(explode(",", $air_temp));
-echo $air_temp_array;
+//echo $air_temp_array;
 if ($mintemp_default[0] > min((float)explode(",", $air_temp)) or $mintemp_default[0] > max((float)explode(",", $air_temp))){
     $temp_graph_area_min = $mintemp_default[1];
 } else {
     $temp_graph_area_min = $mintemp_default[0];
 }
 echo "\n";
-echo $temp_graph_area_min;
+//echo $temp_graph_area_min;
 //
 
 
@@ -500,7 +500,7 @@ $mysqli->close();
                 <th>溶存酸素濃度</th>
             </tr>
             <tr>
-                <td><?php echo $day_now . " " . substr($time, 0, 5) . " 最新"; ?></td>
+                <td><?php echo $day_now . " " . " 最新"; ?></td>
                 <td><?php echo $air_temp_now . "℃"; ?></td>
                 <td><?php echo $rain_hour_now . "mm"; ?></td>
                 <td><?php echo $rain_today_now . "mm"; ?></td>
