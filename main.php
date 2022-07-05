@@ -616,7 +616,7 @@ if (file_exists("images/" . $camera_id . "/" . $dateStr . "/" . $dateStr . "_" .
         ?>
           <!-- <td width="10%" algin="center" style="text-align:center;"> -->
           <td algin="center" style="text-align:center;">
-            <?php echo substr($timeStr, 0, 2); ?>:<?php echo sprintf('%02d', $min + $i); ?><br />
+            <?php echo substr($timeStr, 0, 2); ?>:<?php echo sprintf('%02d', substr($timeStr, 2, 1)."0" + $i); ?><br />
             <img class="miniImg" src="<?php echo $subImg; ?>" border=1 style="cursor:pointer;margin-left:auto;margin-right:auto;" onClick="viewImage('<?php echo $hh . $d_min . "00"; ?>');">
           </td>
         <?php } ?>
