@@ -74,6 +74,7 @@ $dArray;
 $max = array_fill(1, 10, -999);     //$maxを[1]～[10]まで-999で埋める
 $min = array_fill(1, 10, 999);    //$minを[1]～[10]まで 999で埋める
 $data = array();                     //$dataを配列として指定
+$label = "";
 for ($i = 0; $i < 1440; $i++) {
     $h = str_pad(floor($i / 60), 2, 0, STR_PAD_LEFT);
     $m = str_pad(floor($i % 60), 2, 0, STR_PAD_LEFT);
@@ -117,14 +118,12 @@ for ($i = 0; $i < 1440; $i++) {
 //$set_labels = '00時', '01時', '02時', '03時', '04時', '05時', '06時', '07時', '08時', '09時', '10時', '11時', '12時', '13時', '14時',    '15時', '16時', '17時', '18時', '19時', '20時', '21時', '22時', '23時';
 // MySQLより該当日の測定値(平均)を取得（グラフ表示で使用）
 $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
-$sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, water_temp, salinity, do from ksfoods.data where day = '";
+$sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, water_temp, salinity from ksfoods.data where day = '";
 $sql = $sql . str_replace("/", "-", $org_date);
 $sql = $sql . "' group by substring(date_format(time,'%H:%i:%s'),1,8) order by JIKAN";
 $res = $mysqli->query($sql);
-$water_temp = "";     //水温
-$salinity = "";     //塩分濃度
-$do = "";             //溶存酸素濃度
-
+$water_temp = "";     //水温_うに水槽
+$salinity = "";       //塩分濃度_水温_うに水槽
 $i_next = 0;    //時間　MAX24
 $j_next = 0;    //10分毎　MAX5回分（50分）
 while ($row = $res->fetch_array()) {
@@ -133,7 +132,6 @@ while ($row = $res->fetch_array()) {
         if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
         $water_temp = $water_temp . $row[1] . ",";
         $salinity = $salinity . $row[2] . ",";
-        $do = $do . $row[3] . ",";
         if ($j == 5) {                    //50分まで来たらゼロにする
             $j_next = 0;
             $i_next = $i + 1;
@@ -145,14 +143,55 @@ while ($row = $res->fetch_array()) {
         } elseif (substr($row[0], 0, 2) > $i) {
         $water_temp = $water_temp . ",";
         $salinity = $salinity . ",";
-        $do = $do . ",";
         if ($j == 5) {                    //50分まで来たらゼロにする
             $j_next = 0;
         }
         } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
         $water_temp = $water_temp . ",";
         $salinity = $salinity . ",";
-        $do = $do . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        }
+    }
+    }
+}
+
+$row = "";
+$sql = "";
+// 銀鮭水槽用のデータ取得
+//
+$sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, water_temp, do from ksfoods.data_ginzake where day = '";
+$sql = $sql . str_replace("/", "-", $org_date);
+$sql = $sql . "' group by substring(date_format(time,'%H:%i:%s'),1,8) order by JIKAN";
+$res_gin = $mysqli->query($sql);
+$water_temp_gin = ""; //水温_ギンザケ水槽
+$do_ginzake = "";             //溶存酸素濃度_ギンザケ水槽
+$i_next = 0;    //時間　MAX24
+$j_next = 0;    //10分毎　MAX5回分（50分）
+while ($row = $res_gin->fetch_array()) {
+    for ($i = $i_next; $i < 25; $i++) {   //24時まで　
+    for ($j = $j_next; $j < 6; $j++) {    //50分まで
+        if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
+        $water_temp_gin = $water_temp_gin . $row[1] . ",";
+        $do_ginzake = $do_ginzake . $row[2] . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+            $i_next = $i + 1;
+        } else {
+            $j_next = $j + 1;
+            $i_next = $i;
+        }
+        break 2;
+        } elseif (substr($row[0], 0, 2) > $i) {
+        $water_temp_gin = $water_temp_gin . ",";
+        $do_ginzake = $do_ginzake . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
+        $water_temp_gin = $water_temp_gin . ",";
+        $do_ginzake = $do_ginzake . ",";
         if ($j == 5) {                    //50分まで来たらゼロにする
             $j_next = 0;
         }
@@ -166,6 +205,10 @@ $sql = "select * from ksfoods.data order by day desc, time desc limit 1";
 $res3 = $mysqli->query($sql);
 $row3 = $res3->fetch_array();
 
+$sql = "select * from ksfoods.data_ginzake order by day desc, time desc limit 1";
+$res10 = $mysqli->query($sql);
+$row10 = $res10->fetch_array();
+
 // ここで取得した値はグラフ上側の現在値の表示に利用します
 $fact_id = $row3[0];
 $tank_no = $row3[1];
@@ -173,7 +216,9 @@ $day_now = $row3[2];
 $time_now = $row3[3];
 $water_temp_now = $row3[4];
 $salinity_now = $row3[5];
-$do_now = $row3[6];
+
+$water_temp_ginzake_now = $row10[2];
+$do_ginzake_now = $row10[3];
 
 
 // AMeDASからのデータ処理
@@ -259,7 +304,7 @@ while ($row4 = $res4->fetch_array() ){
 }
 
 
-// 平均値データの抽出 水槽データ
+// 平均値データの抽出 うに水槽データ
 $sql5 = "select round(avg(water_temp), 1) as water_temp, round(avg(salinity), 2) as salinity, round(avg(do), 1) as do from ksfoods.data group by day order by day desc, time desc limit 4;";
 $res5 = $mysqli->query($sql5);
 $oldwatertemp = array();
@@ -270,6 +315,18 @@ while ($row5 = $res5->fetch_array() ){
     $oldsalinity[] = $row5[1];
     $olddo[] = $row5[2];
 }
+
+// 平均値データの抽出 銀鮭水槽データ
+$sql11 = "select round(avg(water_temp), 1) as water_temp, round(avg(do), 1) as do from ksfoods.data_ginzake group by day order by day desc, time desc limit 4;";
+$res11 = $mysqli->query($sql11);
+$oldwatertemp_ginzake = array();
+$olddo_ginzake = array();
+while ($row11 = $res11->fetch_array() ){
+    $oldwatertemp_ginzake[] = $row11[0];
+    $olddo_ginzake[] = $row11[1];
+}
+
+
 
 
 // 三日間データの作成　降水量各種（最大値）
@@ -288,44 +345,28 @@ while ($row6 = $res6->fetch_array() ){
 //準備
 $maxtemp_default = array(25, 30, 35, 40, 45);
 $mintemp_default = array(0, -10);
-echo "\n";
 $air_temp_array = (float)max(explode(",", $air_temp));
-//var_dump($air_temp_array);
-echo "\n";
-//echo min($air_temp);
-//$rain_graph_area_a_list = [20, 40, 60, 100, 120, 160]
-//$rain_graph_area_b_list = [40, 80, 120, 160, 200, 240, 280]
 //気温最大値　基準は25℃
 if ($maxtemp_default[3] < $air_temp_array ){
     $temp_graph_area_max = $maxtemp_default[4];
-    //echo "5";
 } elseif ($maxtemp_default[2] < $air_temp_array && $air_temp_array <= $maxtemp_default[3]){
     $temp_graph_area_max = $maxtemp_default[3];
-    //echo "4";
 } elseif ($maxtemp_default[1] < $air_temp_array && $air_temp_array <= $maxtemp_default[2]){
     $temp_graph_area_max = $maxtemp_default[2];
-    //echo "3";
 } elseif ($maxtemp_default[0] < $air_temp_array && $air_temp_array <= $maxtemp_default[1]){
     $temp_graph_area_max = $maxtemp_default[1];
-    //echo "2";
 } elseif ($air_temp_array < $maxtemp_default[0]){
     $temp_graph_area_max = $maxtemp_default[0];
-    //echo "1";
 }
-echo "\n";
-//var_dump(array_diff(explode(",", $air_temp), null));
+
 //気温最小値　基準は0℃
 //負の数同士の比較ができないので、段階を分けてチェックする
-echo "\n";
 $air_temp_array = (float)min(explode(",", $air_temp));
-//echo $air_temp_array;
 if ($mintemp_default[0] > min((float)explode(",", $air_temp)) or $mintemp_default[0] > max((float)explode(",", $air_temp))){
     $temp_graph_area_min = $mintemp_default[1];
 } else {
     $temp_graph_area_min = $mintemp_default[0];
 }
-echo "\n";
-//echo $temp_graph_area_min;
 //
 
 
@@ -465,28 +506,28 @@ $mysqli->close();
     span.abc {
         display: inline-block;
     }
-    table {
+    table.mains {
         text-align: center;
         font-size: 12pt;
         font-weight: bold;
     }
-    table th{
+    table.mains th{
         padding : 5px 5px;
     }
-    table td{
+    table.mains td{
         padding : 5px 5px;
     }
     th,td{
         border:solid 1px #aaaaaa;
     }
-    table tr:nth-child(2){
+    table.mains tr:nth-child(2){
         background: #fff5e5;
         }
     </style>
 
 
     <div align="center">
-    <table>
+    <table class="mains">
         <tbody>
             <tr>
                 <th></th>
@@ -495,8 +536,9 @@ $mysqli->close();
                 <th>日降水量</th>
                 <th>積算降水量</th>
                 <th>歌津水温<br>(10時)</th>
-                <th>水槽水温</th>
+                <th>ウニ水槽水温</th>
                 <th>塩分濃度</th>
+                <th>銀鮭水槽水温</th>
                 <th>溶存酸素濃度</th>
             </tr>
             <tr>
@@ -508,7 +550,8 @@ $mysqli->close();
                 <td><?php echo $uta_temp_10[0] . "℃"; ?></td>
                 <td><?php echo $water_temp_now . "℃"; ?></td>
                 <td><?php echo $salinity_now . "％"; ?></td>
-                <td><?php echo $do_now . "mg/L"; ?></td>
+                <td><?php echo $water_temp_ginzake_now . "℃"; ?></td>
+                <td><?php echo $do_ginzake_now . "mg/L"; ?></td>
             </tr>
             <tr>
                 <td><?php echo $oneday_ago . " 日平均" ?></td>
@@ -519,7 +562,8 @@ $mysqli->close();
                 <td><?php echo $uta_temp_10[1] . "℃"; ?></td>
                 <td><?php echo $oldwatertemp[1] . "℃"; ?></td>
                 <td><?php echo $oldsalinity[1] . "％"; ?></td>
-                <td><?php echo $olddo[1] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake[1] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake[1] . "mg/L"; ?></td>
             </tr>
             <tr>
                 <td><?php echo $twoday_ago . " 日平均" ?></td>
@@ -530,7 +574,8 @@ $mysqli->close();
                 <td><?php echo $uta_temp_10[2] . "℃"; ?></td>
                 <td><?php echo $oldwatertemp[2] . "℃"; ?></td>
                 <td><?php echo $oldsalinity[2] . "％"; ?></td>
-                <td><?php echo $olddo[2] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake[2] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake[2] . "mg/L"; ?></td>
             </tr>
             <tr>
                 <td><?php echo $threeday_ago . " 日平均" ?></td>
@@ -541,16 +586,18 @@ $mysqli->close();
                 <td><?php echo $uta_temp_10[3] . "℃"; ?></td>
                 <td><?php echo $oldwatertemp[3] . "℃"; ?></td>
                 <td><?php echo $oldsalinity[3] . "％"; ?></td>
-                <td><?php echo $olddo[3] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake[3] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake[3] . "mg/L"; ?></td>
             </tr>
         </tbody>
         </table>
     </div>
-    <br>
+    <br>うに水槽<br>
     <canvas id="myChart1"></canvas>
+    <br>銀鮭水槽<br>
     <canvas id="myChart2"></canvas>
+    <br>降水量グラフ<br>
     <canvas id="myChart3"></canvas>
-
 </body>
 
 </html>
@@ -571,7 +618,7 @@ $mysqli->close();
             //max: 144,
             //min: 0,
             //stepSize: 60
-            },
+            }
         }
         ],
         yAxes: [{
@@ -580,7 +627,7 @@ $mysqli->close();
             position: "left",
             scaleLabel: {
                 display: true,
-                labelString: "気温（℃）"
+                labelString: "（℃）"
             },
             ticks: {
                 max: 40,
@@ -596,63 +643,70 @@ $mysqli->close();
             position: "right",
             scaleLabel: {
                 display: true,
-                labelString: "水温"
+                labelString: "塩分濃度（％）"
             },
             ticks: {
-                max: 40.0,
-                min: -10.0,
-                stepSize: 10.0
+                max: 5,
+                min: 0,
+                stepSize: 1
             },
             gridLines: {
                 drawOnChartArea: false,
             }
-        }],
+        }]
     }
     };
-    var complexChartOption2 = {    //下側グラフの設定
+    var complexChartOption2 = {    //ギンザケ水槽グラフの設定
     responsive: false,
     maintainAspectRatio: false,
     scales: {
         xAxes: [ // Ｘ軸設定
         {
             display: true,
-            barPercentage: 0.8,
+            barPercentage: 1.8,
             //categoryPercentage: 1.8,
             gridLines: {
             display: false
             },
         }
         ],
-        yAxes: [{
-        id: "y-axis-1",
-        type: "linear",
-        position: "left",
-        scaleLabel: {
-            display: true,
-            labelString: "塩分濃度（％）"
+        yAxes: [
+            {
+            id: "y-axis-1",
+            type: "linear",
+            position: "left",
+            scaleLabel: {
+                display: true,
+                labelString: "（℃）"
+            },
+            ticks: {
+                max: 40,
+                min: -10,
+                stepSize: 10
+            },
+            gridLines: {
+            drawOnChartArea: true,
+            }
         },
-        ticks: {
-            max: 5,
-            min: 0,
-            stepSize: 1
-        }
-        }, {
-        id: "y-axis-2",
-        type: "linear",
-        position: "right",
-        scaleLabel: {
-            display: true,
-            labelString: "溶存酸素濃度（mg/L）"
-        },
-        ticks: {
-            max: 15.0,
-            min: 5.0,
-            stepSize: 1.0
-        },
-        gridLines: {
-            drawOnChartArea: false,
-        }
-        }],
+            {
+            id: "y-axis-2",
+            type: "linear",
+            position: "right",
+            scaleLabel: {
+                display: true,
+                labelString: "溶存酸素濃度（mg/L）"
+            },
+            ticks: {
+                max: 20,
+                min: 0,
+                stepSize: 2
+            },
+            gridLines: {
+            drawOnChartArea: true,
+            }
+
+            }
+            ],
     }
     };
     var complexChartOption3 = {    //降水量グラフの設定
@@ -706,8 +760,6 @@ $mysqli->close();
         }],
     }
     };
-
-
 </script>
 
 <script>
@@ -720,12 +772,49 @@ $mysqli->close();
         labels: [<?php echo $label; ?>],
         datasets: [{
             type: "line",
+            label: "志津川気温（℃）",
+            data: [<?php echo $air_temp; ?>],
+            borderColor: "rgba(255,150,0,0.4)",
+            backgroundColor: "rgba(255,150,0,0.4)",
+            spanGaps: true,
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
+            type: "line",
             label: "水温（℃）",
             data: [<?php echo $water_temp; ?>],
             borderColor: "rgba(0, 255, 255,0.4)",
             backgroundColor: "rgba(0, 255, 255,0.4)",
             fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
+            type: "line",
+            label: "塩分濃度（%）",
+            data: [<?php echo $salinity; ?>],
+            borderColor: "rgba(0, 255, 0,0.4)",
+            backgroundColor: "rgba(0, 255, 0,0.4)",
+            fill: false, // 中の色を抜く
             yAxisID: "y-axis-2",
+        }
+        ]
+    },
+    options: complexChartOption1
+    });
+    var ctx = document.getElementById("myChart2").getContext("2d");
+    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.height = 250;
+    var myChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+        labels: [<?php echo $label; ?>],
+        datasets: [{
+            type: "line",
+            label: "水温（℃）",
+            data: [<?php echo $water_temp_gin; ?>],
+            borderColor: "rgba(0, 255, 255,0.4)",
+            backgroundColor: "rgba(0, 255, 255,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
         },
         {
             type: "line",
@@ -736,32 +825,11 @@ $mysqli->close();
             spanGaps: true,
             fill: false, // 中の色を抜く
             yAxisID: "y-axis-1",
-        }
-        ]
-    },
-    options: complexChartOption1
-    });
-
-    var ctx = document.getElementById("myChart2").getContext("2d");
-    ctx.canvas.width = window.innerWidth - 20;
-    ctx.canvas.height = 250;
-    var myChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-        labels: [<?php echo $label; ?>],
-        datasets: [{
-            type: "line",
-            label: "塩分濃度（%）",
-            data: [<?php echo $salinity; ?>],
-            borderColor: "rgba(0, 255, 0,0.4)",
-            backgroundColor: "rgba(0, 255, 0,0.4)",
-            fill: false, // 中の色を抜く
-            yAxisID: "y-axis-1",
         },
         {
             type: "bar",
             label: "溶存酸素濃度（mg/L）",
-            data: [<?php echo $do; ?>],
+            data: [<?php echo $do_ginzake; ?>],
             borderColor: "rgba(128,128,0,0.4)",
             backgroundColor: "rgba(128,128,0,0.4)",
             fill: false, // 中の色を抜く
@@ -771,7 +839,6 @@ $mysqli->close();
     },
     options: complexChartOption2
     });
-
     var ctx = document.getElementById("myChart3").getContext("2d");
     ctx.canvas.width = window.innerWidth - 20;
     ctx.canvas.height = 250;
