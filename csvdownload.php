@@ -54,7 +54,7 @@ $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 $mysqli->set_charset('utf8');
 
 //測定値テーブル抽出クエリ
-$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, area_info.temp, area_info.rain_hour FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
+$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, data_ginzake.water_temp,  data_ginzake.do, area_info.temp, area_info.rain_hour FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time LEFT JOIN data_ginzake ON data.day = data_ginzake.day AND data.time = data_ginzake.time WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
 
 $res = $mysqli->query($sql);
 
@@ -62,7 +62,7 @@ $res = $mysqli->query($sql);
 $bom = "\xEF\xBB\xBF";
 
 // ヘッダー作成
-$header_str = "\"日付\",\"時刻\",\"水温\",\"塩分濃度\",\"溶存酸素\",\"志津川気温\",\"時間降水量\"\r\n";
+$header_str = "\"日付\",\"時刻\",\"うに水温\",\"塩分濃度\",\"うに溶存酸素\",\"銀鮭水温\",\"銀鮭溶存酸素\",\"志津川気温\",\"時間降水量\"\r\n";
 
 // ヘッダにbomを付与して出力
 echo $bom . $header_str;
@@ -74,11 +74,13 @@ echo $bom . $header_str;
 while ($row = $res->fetch_array()) {
   print("\"" . $row[0] . "\",\""  //日付
     . $row[1] . "\",\""  //時刻
-    . $row[2] . "\",\""  //水温
+    . $row[2] . "\",\""  //うに水温
     . $row[3] . "\",\""  //塩分濃度
     . $row[4] . "\",\""  //溶存酸素
-    . $row[5] . "\",\""  //志津川気温
-    . $row[6] . "\"\r\n"); //時間降水量
+    . $row[5] . "\",\""  //銀鮭水温
+    . $row[6] . "\",\""  //銀鮭溶存酸素
+    . $row[7] . "\",\""  //志津川気温
+    . $row[8] . "\"\r\n"); //時間降水量
 }
 
 
