@@ -809,15 +809,6 @@ $mysqli->close();
         labels: [<?php echo $label; ?>],
         datasets: [{
             type: "line",
-            label: "水温（℃）",
-            data: [<?php echo $water_temp_gin; ?>],
-            borderColor: "rgba(0, 255, 255,0.4)",
-            backgroundColor: "rgba(0, 255, 255,0.4)",
-            fill: false, // 中の色を抜く
-            yAxisID: "y-axis-1",
-        },
-        {
-            type: "line",
             label: "志津川気温（℃）",
             data: [<?php echo $air_temp; ?>],
             borderColor: "rgba(255,150,0,0.4)",
@@ -825,8 +816,15 @@ $mysqli->close();
             spanGaps: true,
             fill: false, // 中の色を抜く
             yAxisID: "y-axis-1",
-        },
-        {
+        },{
+            type: "line",
+            label: "水温（℃）",
+            data: [<?php echo $water_temp_gin; ?>],
+            borderColor: "rgba(0, 255, 255,0.4)",
+            backgroundColor: "rgba(0, 255, 255,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
             type: "bar",
             label: "溶存酸素濃度（mg/L）",
             data: [<?php echo $do_ginzake; ?>],
