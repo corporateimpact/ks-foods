@@ -778,7 +778,7 @@ $mysqli->close();
                 labelString: "（℃）"
             },
             ticks: {
-                max: 30,
+                max: 35,
                 min: 0,
                 stepSize: 10
             },
@@ -828,7 +828,7 @@ $mysqli->close();
                 labelString: "（℃）"
             },
             ticks: {
-                max: 30,
+                max: 35,
                 min: 0,
                 stepSize: 10
             },
@@ -881,7 +881,7 @@ $mysqli->close();
                 labelString: "（℃）"
             },
             ticks: {
-                max: 30,
+                max: 35,
                 min: 0,
                 stepSize: 10
             },
