@@ -45,6 +45,10 @@ if ($dl_date_to < $dl_date_from) {
   $dl_date_to = $dummy_date;
 }
 
+//テスト用日付
+//$dl_date_from ="2024-07-29";
+//$dl_date_to = "2024-07-30";
+
 
 //ＣＳＶ出力
 header("Content-Type: application/octet-stream");
@@ -54,15 +58,15 @@ $mysqli = new mysqli('localhost', 'root', 'pm#corporate1', 'ksfoods');
 $mysqli->set_charset('utf8');
 
 //測定値テーブル抽出クエリ
-$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, data_ginzake.water_temp,  data_ginzake.do, area_info.temp, area_info.rain_hour FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time LEFT JOIN data_ginzake ON data.day = data_ginzake.day AND data.time = data_ginzake.time WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
-
+//$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, data_ginzake.water_temp,  data_ginzake.do, area_info.temp, area_info.rain_hour FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time LEFT JOIN data_ginzake ON data.day = data_ginzake.day AND data.time = data_ginzake.time WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
+$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, data_ginzake.water_temp,  data_ginzake.do, data_ginzake2.water_temp,  data_ginzake2.do, data_poultry.air_temp,  data_poultry.humidity, area_info.temp, area_info.rain_hour FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time LEFT JOIN data_ginzake ON data.day = data_ginzake.day AND data.time = data_ginzake.time LEFT JOIN data_ginzake2 ON data.day = data_ginzake2.day AND data.time = data_ginzake2.time LEFT JOIN data_poultry ON data.day = data_poultry.day AND data.time = data_poultry.time WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
 $res = $mysqli->query($sql);
 
 // bomをつける
 $bom = "\xEF\xBB\xBF";
 
 // ヘッダー作成
-$header_str = "\"日付\",\"時刻\",\"うに水温\",\"塩分濃度\",\"うに溶存酸素\",\"銀鮭水温\",\"銀鮭溶存酸素\",\"志津川気温\",\"時間降水量\"\r\n";
+$header_str = "\"日付\",\"時刻\",\"うに水温\",\"塩分濃度\",\"うに溶存酸素\",\"銀鮭水温\",\"銀鮭溶存酸素\",\"銀鮭水温2\",\"銀鮭溶存酸素2\",\"養鶏場室温\",\"養鶏場湿度\",\"志津川気温\",\"時間降水量\"\r\n";
 
 // ヘッダにbomを付与して出力
 echo $bom . $header_str;
@@ -79,8 +83,12 @@ while ($row = $res->fetch_array()) {
     . $row[4] . "\",\""  //溶存酸素
     . $row[5] . "\",\""  //銀鮭水温
     . $row[6] . "\",\""  //銀鮭溶存酸素
-    . $row[7] . "\",\""  //志津川気温
-    . $row[8] . "\"\r\n"); //時間降水量
+    . $row[7] . "\",\""  //銀鮭水温2
+    . $row[8] . "\",\""  //銀鮭溶存酸素2
+    . $row[9] . "\",\""  //養鶏場水温
+    . $row[10] . "\",\""  //養鶏場湿度
+    . $row[11] . "\",\""  //志津川気温
+    . $row[12] . "\"\r\n"); //時間降水量
 }
 
 

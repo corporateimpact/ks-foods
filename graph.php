@@ -243,6 +243,49 @@ while ($row = $res_gin->fetch_array()) {
     }
 }
 
+$row = "";
+$sql = "";
+// 養鶏場用のデータ取得
+//
+$sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, air_temp, humidity from ksfoods.data_poultry where day = '";
+$sql = $sql . str_replace("/", "-", $org_date);
+$sql = $sql . "' group by substring(date_format(time,'%H:%i:%s'),1,8) order by JIKAN";
+$res_poul = $mysqli->query($sql);
+$air_temp_poultry = ""; //水温_ギンザケ水槽
+$humidity_poultry = "";             //溶存酸素濃度_ギンザケ水槽
+$i_next = 0;    //時間　MAX24
+$j_next = 0;    //10分毎　MAX5回分（50分）
+while ($row = $res_poul->fetch_array()) {
+    for ($i = $i_next; $i < 25; $i++) {   //24時まで　
+    for ($j = $j_next; $j < 6; $j++) {    //50分まで
+        if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
+        $air_temp_poultry = $air_temp_poultry . $row[1] . ",";
+        $humidity_poultry = $humidity_poultry . $row[2] . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+            $i_next = $i + 1;
+        } else {
+            $j_next = $j + 1;
+            $i_next = $i;
+        }
+        break 2;
+        } elseif (substr($row[0], 0, 2) > $i) {
+        $air_temp_poultry = $air_temp_poultry . ",";
+        $humidity_poultry = $humidity_poultry . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
+        $air_temp_poultry = $air_temp_poultry . ",";
+        $humidity_poultry = $humidity_poultry . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        }
+    }
+    }
+}
+
 // MySQLより最新の測定値情報を取得
 $sql = "select * from ksfoods.data order by day desc, time desc limit 1";
 $res3 = $mysqli->query($sql);
@@ -255,6 +298,11 @@ $row10 = $res10->fetch_array();
 $sql = "select * from ksfoods.data_ginzake2 order by day desc, time desc limit 1";
 $res11 = $mysqli->query($sql);
 $row11 = $res11->fetch_array();
+
+$sql = "select * from ksfoods.data_poultry order by day desc, time desc limit 1";
+$res12 = $mysqli->query($sql);
+$row12 = $res12->fetch_array();
+
 
 // ここで取得した値はグラフ上側の現在値の表示に利用します
 $fact_id = $row3[0];
@@ -270,6 +318,8 @@ $do_ginzake_now = $row10[3];
 $water_temp_ginzake_now2 = $row11[2];
 $do_ginzake_now2 = $row11[3];
 
+$air_temp_poultry_now = $row12[2];
+$humidity_poultry_now = $row12[3];
 
 // AMeDASからのデータ処理
 $sql2 = "select substring(date_format(time,'%H:%i'),1,4) AS JIKAN, round(temp, 1) as temp, rain_hour, rain_days, rain_total from ksfoods.area_info where day = '";
@@ -384,6 +434,16 @@ $olddo_ginzake2 = array();
 while ($row11 = $res11->fetch_array() ){
     $oldwatertemp_ginzake2[] = $row11[0];
     $olddo_ginzake2[] = $row11[1];
+}
+
+// 平均値データの抽出 養鶏場データ
+$sql12 = "select round(avg(air_temp), 1) as air_temp, round(avg(humidity), 1) as humidity from ksfoods.data_poultry group by day order by day desc, time desc limit 4;";
+$res12 = $mysqli->query($sql12);
+$oldairtemp_poultry = array();
+$oldhumidity_poultry = array();
+while ($row12 = $res12->fetch_array() ){
+    $oldairtemp_poultry[] = $row12[0];
+    $oldhumidity_poultry[] = $row12[1];
 }
 
 
@@ -559,7 +619,7 @@ $mysqli->close();
     <input type="text" name="date" id="xxdate" readonly="readonly" value="<?php echo $org_date; ?>">
     <input type="button" value="　撮影画像　" onClick="goMovie();">
     <input type="button" value="　グラフ　" onClick="onGraph();">
-    <input type="button" value="　テスト　" onClick="onGraph2();">
+    <!-- <input type="button" value="　テスト　" onClick="onGraph2();">  -->
     <hr>
     <input type="button" value="グラフデータダウンロード" onclick="onDownload();"> <input type="text" name="date_from" id="xxdate2" readonly="readonly" value="<?php echo $org_date; ?>"> ～ <input type="text" name="date_to" id="xxdate3" readonly="readonly" value="<?php echo $org_date; ?>">
     </form>
@@ -595,17 +655,19 @@ $mysqli->close();
         <tbody>
             <tr>
                 <th></th>
-                <th>志津川気温</th>
-                <th>時間降水量</th>
+                <th>志津川<br>気温</th>
+                <th>時間<br>降水量</th>
                 <th>日降水量</th>
-                <th>積算降水量</th>
+                <th>積算<br>降水量</th>
                 <th>歌津水温<br>(10時)</th>
-                <th>ウニ水槽水温</th>
-                <th>塩分濃度</th>
-                <th>銀鮭水槽水温</th>
-                <th>溶存酸素濃度</th>
-                <th>銀鮭水槽水温2</th>
-                <th>溶存酸素濃度2</th>
+                <th>ウニ水槽<br>水温</th>
+                <th>塩分<br>濃度</th>
+                <th>銀鮭水槽<br>水温</th>
+                <th>溶存酸素<br>濃度</th>
+                <th>銀鮭水槽<br>水温2</th>
+                <th>溶存酸素<br>濃度2</th>
+                <th>養鶏場<br>室温</th>
+                <th>養鶏場<br>湿度</th>
              </tr>
             <tr>
                 <td><?php echo $day_now . " " . " 最新"; ?></td>
@@ -620,6 +682,8 @@ $mysqli->close();
                 <td><?php echo $do_ginzake_now . "mg/L"; ?></td>
                 <td><?php echo $water_temp_ginzake_now2 . "℃"; ?></td>
                 <td><?php echo $do_ginzake_now2 . "mg/L"; ?></td>
+                <td><?php echo $air_temp_poultry_now . "℃"; ?></td>
+                <td><?php echo $humidity_poultry_now . "％"; ?></td>
             </tr>
             <tr>
                 <td><?php echo $oneday_ago . " 日平均" ?></td>
@@ -634,6 +698,8 @@ $mysqli->close();
                 <td><?php echo $olddo_ginzake[1] . "mg/L"; ?></td>
                 <td><?php echo $oldwatertemp_ginzake2[1] . "℃"; ?></td>
                 <td><?php echo $olddo_ginzake2[1] . "mg/L"; ?></td>
+                <td><?php echo $oldairtemp_poultry[1] . "℃"; ?></td>
+                <td><?php echo $oldhumidity_poultry[1] . "％"; ?></td>
             </tr>
             <tr>
                 <td><?php echo $twoday_ago . " 日平均" ?></td>
@@ -648,6 +714,8 @@ $mysqli->close();
                 <td><?php echo $olddo_ginzake[2] . "mg/L"; ?></td>
                 <td><?php echo $oldwatertemp_ginzake2[2] . "℃"; ?></td>
                 <td><?php echo $olddo_ginzake2[2] . "mg/L"; ?></td>
+                <td><?php echo $oldairtemp_poultry[2] . "℃"; ?></td>
+                <td><?php echo $oldhumidity_poultry[2] . "％"; ?></td>
             </tr>
             <tr>
                 <td><?php echo $threeday_ago . " 日平均" ?></td>
@@ -662,6 +730,8 @@ $mysqli->close();
                 <td><?php echo $olddo_ginzake[3] . "mg/L"; ?></td>
                 <td><?php echo $oldwatertemp_ginzake2[3] . "℃"; ?></td>
                 <td><?php echo $olddo_ginzake2[3] . "mg/L"; ?></td>
+                <td><?php echo $oldairtemp_poultry[3] . "℃"; ?></td>
+                <td><?php echo $oldhumidity_poultry[3] . "％"; ?></td>
             </tr>
         </tbody>
         </table>
@@ -672,6 +742,8 @@ $mysqli->close();
     <canvas id="myChart2"></canvas>
     <br>銀鮭水槽2<br>
     <canvas id="myChart4"></canvas>
+    <br>養鶏場<br>
+    <canvas id="myChart5"></canvas>
     <br>降水量グラフ<br>
     <canvas id="myChart3"></canvas>
 </body>
@@ -776,6 +848,59 @@ $mysqli->close();
                 max: 15,
                 min: 5,
                 stepSize: 5
+            },
+            gridLines: {
+            drawOnChartArea: true,
+            }
+
+            }
+            ],
+    }
+    };
+    var complexChartOption4 = {    //養鶏場グラフの設定
+    responsive: false,
+    maintainAspectRatio: false,
+    scales: {
+        xAxes: [ // Ｘ軸設定
+        {
+            display: true,
+            barPercentage: 1.8,
+            //categoryPercentage: 1.8,
+            gridLines: {
+            display: false
+            },
+        }
+        ],
+        yAxes: [
+            {
+            id: "y-axis-1",
+            type: "linear",
+            position: "left",
+            scaleLabel: {
+                display: true,
+                labelString: "（℃）"
+            },
+            ticks: {
+                max: 30,
+                min: 0,
+                stepSize: 10
+            },
+            gridLines: {
+            drawOnChartArea: true,
+            }
+        },
+            {
+            id: "y-axis-2",
+            type: "linear",
+            position: "right",
+            scaleLabel: {
+                display: true,
+                labelString: "湿度（％）"
+            },
+            ticks: {
+                max: 100,
+                min: 25,
+                stepSize: 25
             },
             gridLines: {
             drawOnChartArea: true,
@@ -992,6 +1117,43 @@ $mysqli->close();
         ]
     },
     options: complexChartOption2
+    });
+    var ctx = document.getElementById("myChart5").getContext("2d");
+    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.height = 250;
+    var myChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+        labels: [<?php echo $label; ?>],
+        datasets: [{
+            type: "line",
+            label: "志津川気温（℃）",
+            data: [<?php echo $air_temp; ?>],
+            borderColor: "rgba(255,150,0,0.4)",
+            backgroundColor: "rgba(255,150,0,0.4)",
+            spanGaps: true,
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
+            type: "line",
+            label: "室温（℃）",
+            data: [<?php echo $air_temp_poultry; ?>],
+            borderColor: "rgba(240, 128, 128,0.4)",
+            backgroundColor: "rgba(240, 128, 128,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
+            type: "bar",
+            label: "湿度（mg/L）",
+            data: [<?php echo $humidity_poultry; ?>],
+            borderColor: "rgba(0, 206, 209,0.4)",
+            backgroundColor: "rgba(0, 206, 209,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-2",
+        }
+        ]
+    },
+    options: complexChartOption4
     });
 
 </script>
