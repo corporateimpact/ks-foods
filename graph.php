@@ -1144,7 +1144,7 @@ $mysqli->close();
             yAxisID: "y-axis-1",
         },{
             type: "bar",
-            label: "湿度（mg/L）",
+            label: "湿度（％）",
             data: [<?php echo $humidity_poultry; ?>],
             borderColor: "rgba(0, 206, 209,0.4)",
             backgroundColor: "rgba(0, 206, 209,0.4)",
