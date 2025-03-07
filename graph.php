@@ -159,14 +159,14 @@ while ($row = $res->fetch_array()) {
 
 $row = "";
 $sql = "";
-// 銀鮭水槽用のデータ取得
+// 銀鮭2番水槽用のデータ取得
 //
 $sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, water_temp, do from ksfoods.data_ginzake where day = '";
 $sql = $sql . str_replace("/", "-", $org_date);
 $sql = $sql . "' group by substring(date_format(time,'%H:%i:%s'),1,8) order by JIKAN";
 $res_gin = $mysqli->query($sql);
-$water_temp_gin = ""; //水温_ギンザケ水槽
-$do_ginzake = "";             //溶存酸素濃度_ギンザケ水槽
+$water_temp_gin = ""; //水温_ギンザケ2番水槽
+$do_ginzake = "";             //溶存酸素濃度_ギンザケ2番水槽
 $i_next = 0;    //時間　MAX24
 $j_next = 0;    //10分毎　MAX5回分（50分）
 while ($row = $res_gin->fetch_array()) {
@@ -202,14 +202,14 @@ while ($row = $res_gin->fetch_array()) {
 
 $row = "";
 $sql = "";
-// 銀鮭水槽2用のデータ取得
+// 銀鮭5番水槽用のデータ取得
 //
 $sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, water_temp, do from ksfoods.data_ginzake2 where day = '";
 $sql = $sql . str_replace("/", "-", $org_date);
 $sql = $sql . "' group by substring(date_format(time,'%H:%i:%s'),1,8) order by JIKAN";
 $res_gin = $mysqli->query($sql);
-$water_temp_gin2 = ""; //水温_ギンザケ水槽
-$do_ginzake2 = "";             //溶存酸素濃度_ギンザケ水槽
+$water_temp_gin2 = ""; //水温_ギンザケ5番水槽
+$do_ginzake2 = "";             //溶存酸素濃度_ギンザケ5番水槽
 $i_next = 0;    //時間　MAX24
 $j_next = 0;    //10分毎　MAX5回分（50分）
 while ($row = $res_gin->fetch_array()) {
@@ -242,6 +242,99 @@ while ($row = $res_gin->fetch_array()) {
     }
     }
 }
+
+
+$row = "";
+$sql = "";
+// 銀鮭15番水槽用のデータ取得
+//
+$sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, water_temp, do from ksfoods.data_ginzake3 where day = '";
+$sql = $sql . str_replace("/", "-", $org_date);
+$sql = $sql . "' group by substring(date_format(time,'%H:%i:%s'),1,8) order by JIKAN";
+$res_gin = $mysqli->query($sql);
+$water_temp_gin3 = ""; //水温_ギンザケ15番水槽
+$do_ginzake3 = "";             //溶存酸素濃度_ギンザケ15番水槽
+$i_next = 0;    //時間　MAX24
+$j_next = 0;    //10分毎　MAX5回分（50分）
+while ($row = $res_gin->fetch_array()) {
+    for ($i = $i_next; $i < 25; $i++) {   //24時まで　
+    for ($j = $j_next; $j < 6; $j++) {    //50分まで
+        if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
+        $water_temp_gin3 = $water_temp_gin3 . $row[1] . ",";
+        $do_ginzake3 = $do_ginzake3 . $row[2] . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+            $i_next = $i + 1;
+        } else {
+            $j_next = $j + 1;
+            $i_next = $i;
+        }
+        break 2;
+        } elseif (substr($row[0], 0, 2) > $i) {
+        $water_temp_gin3 = $water_temp_gin3 . ",";
+        $do_ginzake3 = $do_ginzake3 . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
+        $water_temp_gin3 = $water_temp_gin3 . ",";
+        $do_ginzake3 = $do_ginzake3 . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        }
+    }
+    }
+}
+
+
+$row = "";
+$sql = "";
+// 銀鮭20番水槽用のデータ取得
+//
+$sql = "select substring(date_format(time,'%H:%i:%s'),1,8) AS JIKAN, water_temp, do from ksfoods.data_ginzake4 where day = '";
+$sql = $sql . str_replace("/", "-", $org_date);
+$sql = $sql . "' group by substring(date_format(time,'%H:%i:%s'),1,8) order by JIKAN";
+$res_gin = $mysqli->query($sql);
+$water_temp_gin4 = ""; //水温_ギンザケ20番水槽
+$do_ginzake4 = "";             //溶存酸素濃度_ギンザケ20番水槽
+$i_next = 0;    //時間　MAX24
+$j_next = 0;    //10分毎　MAX5回分（50分）
+while ($row = $res_gin->fetch_array()) {
+    for ($i = $i_next; $i < 25; $i++) {   //24時まで　
+    for ($j = $j_next; $j < 6; $j++) {    //50分まで
+        if (substr($row[0], 0, 2) == $i and substr($row[0], 3, 1) == $j) {
+        $water_temp_gin4 = $water_temp_gin4 . $row[1] . ",";
+        $do_ginzake4 = $do_ginzake4 . $row[2] . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+            $i_next = $i + 1;
+        } else {
+            $j_next = $j + 1;
+            $i_next = $i;
+        }
+        break 2;
+        } elseif (substr($row[0], 0, 2) > $i) {
+        $water_temp_gin4 = $water_temp_gin4 . ",";
+        $do_ginzake4 = $do_ginzake4 . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        } elseif (substr($row[0], 0, 2) >= $i and substr($row[0], 3, 1) > $j) {
+        $water_temp_gin4 = $water_temp_gin4 . ",";
+        $do_ginzake4 = $do_ginzake4 . ",";
+        if ($j == 5) {                    //50分まで来たらゼロにする
+            $j_next = 0;
+        }
+        }
+    }
+    }
+}
+
+
+
+
+
 
 $row = "";
 $sql = "";
@@ -303,6 +396,16 @@ $sql = "select * from ksfoods.data_poultry order by day desc, time desc limit 1"
 $res12 = $mysqli->query($sql);
 $row12 = $res12->fetch_array();
 
+$sql = "select * from ksfoods.data_ginzake3 order by day desc, time desc limit 1";
+$res13 = $mysqli->query($sql);
+$row13 = $res13->fetch_array();
+
+$sql = "select * from ksfoods.data_ginzake4 order by day desc, time desc limit 1";
+$res14 = $mysqli->query($sql);
+$row14 = $res14->fetch_array();
+
+
+
 
 // ここで取得した値はグラフ上側の現在値の表示に利用します
 $fact_id = $row3[0];
@@ -320,6 +423,14 @@ $do_ginzake_now2 = $row11[3];
 
 $air_temp_poultry_now = $row12[2];
 $humidity_poultry_now = $row12[3];
+
+$water_temp_ginzake_now3 = $row13[2];
+$do_ginzake_now3 = $row13[3];
+
+$water_temp_ginzake_now4 = $row14[2];
+$do_ginzake_now4 = $row14[3];
+
+
 
 // AMeDASからのデータ処理
 $sql2 = "select substring(date_format(time,'%H:%i'),1,4) AS JIKAN, round(temp, 1) as temp, rain_hour, rain_days, rain_total from ksfoods.area_info where day = '";
@@ -416,7 +527,7 @@ while ($row5 = $res5->fetch_array() ){
     $olddo[] = $row5[2];
 }
 
-// 平均値データの抽出 銀鮭水槽データ
+// 平均値データの抽出 銀鮭2番水槽データ
 $sql11 = "select round(avg(water_temp), 1) as water_temp, round(avg(do), 1) as do from ksfoods.data_ginzake group by day order by day desc, time desc limit 4;";
 $res11 = $mysqli->query($sql11);
 $oldwatertemp_ginzake = array();
@@ -426,7 +537,7 @@ while ($row11 = $res11->fetch_array() ){
     $olddo_ginzake[] = $row11[1];
 }
 
-// 平均値データの抽出 銀鮭水槽2データ
+// 平均値データの抽出 銀鮭5番水槽データ
 $sql11 = "select round(avg(water_temp), 1) as water_temp, round(avg(do), 1) as do from ksfoods.data_ginzake2 group by day order by day desc, time desc limit 4;";
 $res11 = $mysqli->query($sql11);
 $oldwatertemp_ginzake2 = array();
@@ -444,6 +555,27 @@ $oldhumidity_poultry = array();
 while ($row12 = $res12->fetch_array() ){
     $oldairtemp_poultry[] = $row12[0];
     $oldhumidity_poultry[] = $row12[1];
+}
+
+
+// 平均値データの抽出 銀鮭15番水槽データ
+$sql13 = "select round(avg(water_temp), 1) as water_temp, round(avg(do), 1) as do from ksfoods.data_ginzake3 group by day order by day desc, time desc limit 4;";
+$res13 = $mysqli->query($sql13);
+$oldwatertemp_ginzake3 = array();
+$olddo_ginzake3 = array();
+while ($row13 = $res13->fetch_array() ){
+    $oldwatertemp_ginzake3[] = $row13[0];
+    $olddo_ginzake3[] = $row13[1];
+}
+
+// 平均値データの抽出 銀鮭20番水槽データ
+$sql14 = "select round(avg(water_temp), 1) as water_temp, round(avg(do), 1) as do from ksfoods.data_ginzake4 group by day order by day desc, time desc limit 4;";
+$res14 = $mysqli->query($sql14);
+$oldwatertemp_ginzake4 = array();
+$olddo_ginzake4 = array();
+while ($row14 = $res14->fetch_array() ){
+    $oldwatertemp_ginzake4[] = $row14[0];
+    $olddo_ginzake4[] = $row14[1];
 }
 
 
@@ -646,7 +778,13 @@ $mysqli->close();
     }
     table.mains tr:nth-child(2){
         background: #fff5e5;
-        }
+    }
+    .graphname {
+        text-indent: 15px;
+    }
+    .graphset {
+        text-align: center
+    }
     </style>
 
 
@@ -662,10 +800,14 @@ $mysqli->close();
                 <th>歌津水温<br>(10時)</th>
                 <th>ウニ水槽<br>水温</th>
                 <th>塩分<br>濃度</th>
-                <th>銀鮭水槽<br>水温</th>
-                <th>溶存酸素<br>濃度</th>
-                <th>銀鮭水槽<br>水温2</th>
-                <th>溶存酸素<br>濃度2</th>
+                <th>2番水槽<br>水温</th>
+                <th>2番水槽<br>DO</th>
+                <th>5番水槽<br>水温</th>
+                <th>5番水槽<br>DO</th>
+                <th>15番水槽<br>水温</th>
+                <th>15番水槽<br>DO</th>
+                <th>20番水槽<br>水温</th>
+                <th>20番水槽<br>DO</th>
                 <th>養鶏場<br>室温</th>
                 <th>養鶏場<br>湿度</th>
              </tr>
@@ -682,6 +824,10 @@ $mysqli->close();
                 <td><?php echo $do_ginzake_now . "mg/L"; ?></td>
                 <td><?php echo $water_temp_ginzake_now2 . "℃"; ?></td>
                 <td><?php echo $do_ginzake_now2 . "mg/L"; ?></td>
+                <td><?php echo $water_temp_ginzake_now3 . "℃"; ?></td>
+                <td><?php echo $do_ginzake_now3 . "mg/L"; ?></td>
+                <td><?php echo $water_temp_ginzake_now4 . "℃"; ?></td>
+                <td><?php echo $do_ginzake_now4 . "mg/L"; ?></td>
                 <td><?php echo $air_temp_poultry_now . "℃"; ?></td>
                 <td><?php echo $humidity_poultry_now . "％"; ?></td>
             </tr>
@@ -698,6 +844,10 @@ $mysqli->close();
                 <td><?php echo $olddo_ginzake[1] . "mg/L"; ?></td>
                 <td><?php echo $oldwatertemp_ginzake2[1] . "℃"; ?></td>
                 <td><?php echo $olddo_ginzake2[1] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake3[1] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake3[1] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake4[1] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake4[1] . "mg/L"; ?></td>
                 <td><?php echo $oldairtemp_poultry[1] . "℃"; ?></td>
                 <td><?php echo $oldhumidity_poultry[1] . "％"; ?></td>
             </tr>
@@ -714,6 +864,10 @@ $mysqli->close();
                 <td><?php echo $olddo_ginzake[2] . "mg/L"; ?></td>
                 <td><?php echo $oldwatertemp_ginzake2[2] . "℃"; ?></td>
                 <td><?php echo $olddo_ginzake2[2] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake3[2] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake3[2] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake4[2] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake4[2] . "mg/L"; ?></td>
                 <td><?php echo $oldairtemp_poultry[2] . "℃"; ?></td>
                 <td><?php echo $oldhumidity_poultry[2] . "％"; ?></td>
             </tr>
@@ -730,22 +884,30 @@ $mysqli->close();
                 <td><?php echo $olddo_ginzake[3] . "mg/L"; ?></td>
                 <td><?php echo $oldwatertemp_ginzake2[3] . "℃"; ?></td>
                 <td><?php echo $olddo_ginzake2[3] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake3[3] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake3[3] . "mg/L"; ?></td>
+                <td><?php echo $oldwatertemp_ginzake4[3] . "℃"; ?></td>
+                <td><?php echo $olddo_ginzake4[3] . "mg/L"; ?></td>
                 <td><?php echo $oldairtemp_poultry[3] . "℃"; ?></td>
                 <td><?php echo $oldhumidity_poultry[3] . "％"; ?></td>
             </tr>
         </tbody>
         </table>
     </div>
-    <br>うに水槽<br>
-    <canvas id="myChart1"></canvas>
-    <br>銀鮭水槽<br>
-    <canvas id="myChart2"></canvas>
-    <br>銀鮭水槽2<br>
-    <canvas id="myChart4"></canvas>
-    <br>養鶏場<br>
-    <canvas id="myChart5"></canvas>
-    <br>降水量グラフ<br>
-    <canvas id="myChart3"></canvas>
+    <div class="graphname">うに水槽</div>
+    <div class="graphset"><canvas id="myChart1"></canvas></div>
+    <div class="graphname">2番水槽</div>
+    <div class="graphset"><canvas id="myChart2"></canvas></div>
+    <div class="graphname">5番水槽</div>
+    <div class="graphset"><canvas id="myChart4"></canvas></div>
+    <div class="graphname">15番水槽</div>
+    <div class="graphset"><canvas id="myChart6"></canvas></div>
+    <div class="graphname">20番水槽</div>
+    <div class="graphset"><canvas id="myChart7"></canvas></div>
+    <div class="graphname">養鶏場</div>
+    <div class="graphset"><canvas id="myChart5"></canvas></div>
+    <div class="graphname">降水量グラフ</div>
+    <div class="graphset"><canvas id="myChart3"></canvas></div>
 </body>
 
 </html>
@@ -965,7 +1127,7 @@ $mysqli->close();
 
 <script>
     var ctx = document.getElementById("myChart1").getContext("2d");
-    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.width = window.innerWidth - 50;
     ctx.canvas.height = 250;
     var myChart = new Chart(ctx, {
     type: "bar",
@@ -1002,7 +1164,7 @@ $mysqli->close();
     options: complexChartOption1
     });
     var ctx = document.getElementById("myChart2").getContext("2d");
-    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.width = window.innerWidth - 50;
     ctx.canvas.height = 250;
     var myChart = new Chart(ctx, {
     type: "bar",
@@ -1039,7 +1201,7 @@ $mysqli->close();
     options: complexChartOption2
     });
     var ctx = document.getElementById("myChart3").getContext("2d");
-    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.width = window.innerWidth - 50;
     ctx.canvas.height = 250;
     var myChart = new Chart(ctx, {
     type: "bar",
@@ -1082,7 +1244,7 @@ $mysqli->close();
     options: complexChartOption3
     });
     var ctx = document.getElementById("myChart4").getContext("2d");
-    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.width = window.innerWidth - 50;
     ctx.canvas.height = 250;
     var myChart = new Chart(ctx, {
     type: "bar",
@@ -1119,7 +1281,7 @@ $mysqli->close();
     options: complexChartOption2
     });
     var ctx = document.getElementById("myChart5").getContext("2d");
-    ctx.canvas.width = window.innerWidth - 20;
+    ctx.canvas.width = window.innerWidth - 50;
     ctx.canvas.height = 250;
     var myChart = new Chart(ctx, {
     type: "bar",
@@ -1155,5 +1317,82 @@ $mysqli->close();
     },
     options: complexChartOption4
     });
+
+        var ctx = document.getElementById("myChart6").getContext("2d");
+    ctx.canvas.width = window.innerWidth - 50;
+    ctx.canvas.height = 250;
+    var myChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+        labels: [<?php echo $label; ?>],
+        datasets: [{
+            type: "line",
+            label: "志津川気温（℃）",
+            data: [<?php echo $air_temp; ?>],
+            borderColor: "rgba(255,150,0,0.4)",
+            backgroundColor: "rgba(255,150,0,0.4)",
+            spanGaps: true,
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
+            type: "line",
+            label: "水温（℃）",
+            data: [<?php echo $water_temp_gin3; ?>],
+            borderColor: "rgba(0, 255, 255,0.4)",
+            backgroundColor: "rgba(0, 255, 255,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
+            type: "bar",
+            label: "溶存酸素濃度（mg/L）",
+            data: [<?php echo $do_ginzake3; ?>],
+            borderColor: "rgba(128,128,0,0.4)",
+            backgroundColor: "rgba(128,128,0,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-2",
+        }
+        ]
+    },
+    options: complexChartOption2
+    });
+
+        var ctx = document.getElementById("myChart7").getContext("2d");
+    ctx.canvas.width = window.innerWidth - 50;
+    ctx.canvas.height = 250;
+    var myChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+        labels: [<?php echo $label; ?>],
+        datasets: [{
+            type: "line",
+            label: "志津川気温（℃）",
+            data: [<?php echo $air_temp; ?>],
+            borderColor: "rgba(255,150,0,0.4)",
+            backgroundColor: "rgba(255,150,0,0.4)",
+            spanGaps: true,
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
+            type: "line",
+            label: "水温（℃）",
+            data: [<?php echo $water_temp_gin4; ?>],
+            borderColor: "rgba(0, 255, 255,0.4)",
+            backgroundColor: "rgba(0, 255, 255,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-1",
+        },{
+            type: "bar",
+            label: "溶存酸素濃度（mg/L）",
+            data: [<?php echo $do_ginzake4; ?>],
+            borderColor: "rgba(128,128,0,0.4)",
+            backgroundColor: "rgba(128,128,0,0.4)",
+            fill: false, // 中の色を抜く
+            yAxisID: "y-axis-2",
+        }
+        ]
+    },
+    options: complexChartOption2
+    });
+
 
 </script>

@@ -59,14 +59,44 @@ $mysqli->set_charset('utf8');
 
 //測定値テーブル抽出クエリ
 //$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, data_ginzake.water_temp,  data_ginzake.do, area_info.temp, area_info.rain_hour FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time LEFT JOIN data_ginzake ON data.day = data_ginzake.day AND data.time = data_ginzake.time WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
-$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do, data_ginzake.water_temp,  data_ginzake.do, data_ginzake2.water_temp,  data_ginzake2.do, data_poultry.air_temp,  data_poultry.humidity, area_info.temp, area_info.rain_hour FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time LEFT JOIN data_ginzake ON data.day = data_ginzake.day AND data.time = data_ginzake.time LEFT JOIN data_ginzake2 ON data.day = data_ginzake2.day AND data.time = data_ginzake2.time LEFT JOIN data_poultry ON data.day = data_poultry.day AND data.time = data_poultry.time WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
+//うに水槽抽出
+$sql = "SELECT data.day, data.time, data.water_temp, data.salinity, data.do";
+//ギンザケ2番水槽抽出
+$sql = $sql . ", data_ginzake.water_temp,  data_ginzake.do";
+//ギンザケ5番水槽抽出
+$sql = $sql . ", data_ginzake2.water_temp,  data_ginzake2.do";
+//ギンザケ15番水槽抽出
+$sql = $sql . ", data_ginzake3.water_temp,  data_ginzake3.do";
+//ギンザケ20番水槽抽出
+$sql = $sql . ", data_ginzake4.water_temp,  data_ginzake4.do";
+//養鶏場抽出
+$sql = $sql . ", data_poultry.air_temp,  data_poultry.humidity";
+//天候抽出
+$sql = $sql . ", area_info.temp, area_info.rain_hour";
+//うに水槽と天候を基準にデータベース結合
+$sql = $sql . " FROM data LEFT JOIN area_info ON data.fact_id = area_info.factory_id AND data.day = area_info.day AND data.time = area_info.time";
+//ギンザケ2番水槽
+$sql = $sql . " LEFT JOIN data_ginzake ON data.day = data_ginzake.day AND data.time = data_ginzake.time";
+//ギンザケ5番水槽
+$sql = $sql . " LEFT JOIN data_ginzake2 ON data.day = data_ginzake2.day AND data.time = data_ginzake2.time";
+//養鶏場
+$sql = $sql . " LEFT JOIN data_poultry ON data.day = data_poultry.day AND data.time = data_poultry.time";
+//日付範囲指定等
+$sql = $sql . " WHERE data.day BETWEEN '" . $dl_date_from . "' AND '" . $dl_date_to . "' ORDER BY data.day, data.time";
 $res = $mysqli->query($sql);
 
 // bomをつける
 $bom = "\xEF\xBB\xBF";
 
 // ヘッダー作成
-$header_str = "\"日付\",\"時刻\",\"うに水温\",\"塩分濃度\",\"うに溶存酸素\",\"銀鮭水温\",\"銀鮭溶存酸素\",\"銀鮭水温2\",\"銀鮭溶存酸素2\",\"養鶏場室温\",\"養鶏場湿度\",\"志津川気温\",\"時間降水量\"\r\n";
+$header_str = '"\"日付\",\"時刻\",\"うに水温\",\"塩分濃度\",\"うに溶存酸素\"';
+$header_str = $header_str . ',\"銀鮭2番水温\",\"2番水槽溶存酸素\"';
+$header_str = $header_str . ',\"銀鮭5番水温\",\"5番水槽溶存酸素\"';
+$header_str = $header_str . ',\"銀鮭15番水温\",\"15番水槽溶存酸素\"';
+$header_str = $header_str . ',\"銀鮭20番水温\",\"20番水槽溶存酸素\"';
+$header_str = $header_str . ',\"養鶏場室温\",\"養鶏場湿度\"';
+$header_str = $header_str . ',\"志津川気温\",\"時間降水量\"';
+$header_str = $header_str . '\r\n"';
 
 // ヘッダにbomを付与して出力
 echo $bom . $header_str;
@@ -81,14 +111,18 @@ while ($row = $res->fetch_array()) {
     . $row[2] . "\",\""  //うに水温
     . $row[3] . "\",\""  //塩分濃度
     . $row[4] . "\",\""  //溶存酸素
-    . $row[5] . "\",\""  //銀鮭水温
-    . $row[6] . "\",\""  //銀鮭溶存酸素
-    . $row[7] . "\",\""  //銀鮭水温2
-    . $row[8] . "\",\""  //銀鮭溶存酸素2
-    . $row[9] . "\",\""  //養鶏場水温
-    . $row[10] . "\",\""  //養鶏場湿度
-    . $row[11] . "\",\""  //志津川気温
-    . $row[12] . "\"\r\n"); //時間降水量
+    . $row[5] . "\",\""  //銀鮭2番水温
+    . $row[6] . "\",\""  //銀鮭2番溶存酸素
+    . $row[7] . "\",\""  //銀鮭5番水温
+    . $row[8] . "\",\""  //銀鮭5番溶存酸素
+    . $row[9] . "\",\""  //銀鮭15番水温
+    . $row[10] . "\",\""  //銀鮭15番溶存酸素
+    . $row[11] . "\",\""  //銀鮭20番水温
+    . $row[12] . "\",\""  //銀鮭20番溶存酸素
+    . $row[13] . "\",\""  //養鶏場室温
+    . $row[14] . "\",\""  //養鶏場湿度
+    . $row[15] . "\",\""  //志津川気温
+    . $row[16] . "\"\r\n"); //時間降水量
 }
 
 
