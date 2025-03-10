@@ -46,8 +46,8 @@ if ($dl_date_to < $dl_date_from) {
 }
 
 //テスト用日付
-//$dl_date_from ="2024-07-29";
-//$dl_date_to = "2024-07-30";
+//$dl_date_from ="2025-03-09";
+//$dl_date_to = "2025-03-10";
 
 
 //ＣＳＶ出力
@@ -79,6 +79,10 @@ $sql = $sql . " FROM data LEFT JOIN area_info ON data.fact_id = area_info.factor
 $sql = $sql . " LEFT JOIN data_ginzake ON data.day = data_ginzake.day AND data.time = data_ginzake.time";
 //ギンザケ5番水槽
 $sql = $sql . " LEFT JOIN data_ginzake2 ON data.day = data_ginzake2.day AND data.time = data_ginzake2.time";
+//ギンザケ15番水槽
+$sql = $sql . " LEFT JOIN data_ginzake3 ON data.day = data_ginzake3.day AND data.time = data_ginzake3.time";
+//ギンザケ20番水槽
+$sql = $sql . " LEFT JOIN data_ginzake4 ON data.day = data_ginzake4.day AND data.time = data_ginzake4.time";
 //養鶏場
 $sql = $sql . " LEFT JOIN data_poultry ON data.day = data_poultry.day AND data.time = data_poultry.time";
 //日付範囲指定等
