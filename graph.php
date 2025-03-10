@@ -800,14 +800,14 @@ $mysqli->close();
                 <th>歌津水温<br>(10時)</th>
                 <th>ウニ水槽<br>水温</th>
                 <th>塩分<br>濃度</th>
-                <th>2番水槽<br>水温</th>
-                <th>2番水槽<br>DO</th>
-                <th>5番水槽<br>水温</th>
-                <th>5番水槽<br>DO</th>
-                <th>15番水槽<br>水温</th>
-                <th>15番水槽<br>DO</th>
-                <th>20番水槽<br>水温</th>
-                <th>20番水槽<br>DO</th>
+                <th>2番池<br>水温</th>
+                <th>2番池<br>DO</th>
+                <th>5番池<br>水温</th>
+                <th>5番池<br>DO</th>
+                <th>15番池<br>水温</th>
+                <th>15番池<br>DO</th>
+                <th>20番池<br>水温</th>
+                <th>20番池<br>DO</th>
                 <th>養鶏場<br>室温</th>
                 <th>養鶏場<br>湿度</th>
              </tr>
@@ -896,13 +896,13 @@ $mysqli->close();
     </div>
     <div class="graphname">うに水槽</div>
     <div class="graphset"><canvas id="myChart1"></canvas></div>
-    <div class="graphname">2番水槽</div>
+    <div class="graphname">2番池</div>
     <div class="graphset"><canvas id="myChart2"></canvas></div>
-    <div class="graphname">5番水槽</div>
+    <div class="graphname">5番池</div>
     <div class="graphset"><canvas id="myChart4"></canvas></div>
-    <div class="graphname">15番水槽</div>
+    <div class="graphname">15番池</div>
     <div class="graphset"><canvas id="myChart6"></canvas></div>
-    <div class="graphname">20番水槽</div>
+    <div class="graphname">20番池</div>
     <div class="graphset"><canvas id="myChart7"></canvas></div>
     <div class="graphname">養鶏場</div>
     <div class="graphset"><canvas id="myChart5"></canvas></div>
