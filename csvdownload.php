@@ -99,11 +99,12 @@ $header_str = $header_str . ',"銀鮭5番池","5番池溶存酸素"';
 $header_str = $header_str . ',"銀鮭15番池","15番池溶存酸素"';
 $header_str = $header_str . ',"銀鮭20番池","20番池溶存酸素"';
 $header_str = $header_str . ',"養鶏場室温","養鶏場湿度"';
-$header_str = $header_str . ',"志津川気温","時間降水量"';
-$header_str = $header_str . ',"\r\n"';
+$header_str = $header_str . ',"志津川気温","時間降水量",';
+//$header_str = $header_str . '\r\n';
 
 // ヘッダにbomを付与して出力
 echo $bom . $header_str;
+echo "\n";
 
 // または↓でSJISエンコード
 // echo mb_convert_encoding($header_str, "SJIS", "UTF-8");
