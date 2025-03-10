@@ -93,11 +93,11 @@ $res = $mysqli->query($sql);
 $bom = "\xEF\xBB\xBF";
 
 // ヘッダー作成
-$header_str = '"日付","時刻","うに水温","塩分濃度","うに溶存酸素"';
-$header_str = $header_str . ',"銀鮭2番池水温","2番池溶存酸素"';
-$header_str = $header_str . ',"銀鮭5番池水温","5番池溶存酸素"';
-$header_str = $header_str . ',"銀鮭15番池水温","15番池溶存酸素"';
-$header_str = $header_str . ',"銀鮭20番池水温","20番池溶存酸素"';
+$header_str = '"日付","時刻","うに水温","塩分濃度","うにDO"';
+$header_str = $header_str . ',"2番池水温","2番池DO"';
+$header_str = $header_str . ',"5番池水温","5番池DO"';
+$header_str = $header_str . ',"15番池水温","15番池DO"';
+$header_str = $header_str . ',"20番池水温","20番池DO"';
 $header_str = $header_str . ',"養鶏場室温","養鶏場湿度"';
 $header_str = $header_str . ',"志津川気温","時間降水量",';
 //$header_str = $header_str . '\r\n';
